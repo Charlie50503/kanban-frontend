@@ -89,7 +89,8 @@
         <!-- 依序渲染每個欄位 -->
         <ng-container *ngFor="let column of getSortedColumns()">
           <div
-            class="bg-gray-50 rounded-xl p-4 w-80 min-h-[600px] flex-shrink-0 transition-all duration-200"
+            class="bg-gray-50 rounded-xl p-4 w-80 min-h-[600px] flex-shrink-0 transition-all duration-200 column-container"
+            [class.drag-over]="isDragOver"
           >
             <!-- 欄位標題與管理按鈕 -->
             <div class="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 z-10 pb-2">
@@ -136,8 +137,12 @@
             <div
               cdkDropList
               [cdkDropListData]="column.tasks"
-              class="space-y-2 overflow-y-auto max-h-[520px]"
-              (cdkDropListDropped)="drop($event, column.id)"
+              [cdkDropListConnectedTo]="getConnectedDropLists()"
+              class="space-y-2 overflow-y-auto max-h-[520px] min-h-[400px] p-1"
+              (cdkDropListDropped)="drop($event)"
+              (cdkDropListEntered)="isDragOver = true"
+              (cdkDropListExited)="isDragOver = false"
+              [id]="'drop-list-' + column.id"
             >
               <!-- 顯示「新增任務表單」 -->
               <div *ngIf="showAddTaskColumn === column.id">
@@ -199,10 +204,13 @@
               </div>
 
               <!-- 任務卡片 (可拖放) -->
-              <div
-                *ngFor="let task of column.tasks; let idx = index"
+               @for (task of column.tasks; track task.id) {
+                <div
+
                 cdkDrag
-                class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 cursor-move hover:shadow-md transition-all duration-200 group"
+                [cdkDragData]="task"
+                class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 cursor-move hover:shadow-md transition-all duration-200 group task-card"
+                [class.cdk-drag-animating]="false"
               >
                 <div class="flex items-start gap-2">
                   <div class="flex-shrink-0 mt-1 text-gray-400 group-hover:text-gray-600 transition-colors">
@@ -289,13 +297,18 @@
                   </div>
                 </div>
               </div>
+               }
 
-              <!-- 空白拖放區 (顯示在沒有任務時) -->
+
+              <!-- 拖拽放置預覽區 -->
               <div
                 *ngIf="column.tasks.length === 0"
-                class="h-16 border-2 border-dashed border-blue-400 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-sm font-medium"
+                class="h-20 border-2 border-dashed border-gray-300 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 text-sm font-medium transition-colors"
+                [class.border-blue-400]="isDragOver"
+                [class.bg-blue-50]="isDragOver"
+                [class.text-blue-600]="isDragOver"
               >
-                拖拽任務到此
+                {{ isDragOver ? '放置任務到此處' : '拖拽任務到此' }}
               </div>
             </div>
           </div>

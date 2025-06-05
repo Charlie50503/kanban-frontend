@@ -21,8 +21,8 @@ import { Project, Task, Column } from './intefaces/task.interface';
   styleUrl: './kanban-board.scss',
 })
 export class KanbanBoard {
-   /** 專案陣列 */
-   projects: Project[] = [
+  /** 專案陣列 */
+  projects: Project[] = [
     {
       id: 'project-1',
       name: '網站重構專案',
@@ -202,20 +202,37 @@ export class KanbanBoard {
     'bg-teal-500', 'bg-gray-500'
   ];
 
+  /** 是否正在拖拽中 */
+  isDragOver: boolean = false;
+
   /** 產生唯一 ID */
   generateId(): string {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
 
+  /** 取得所有連接的拖放列表 ID */
+  getConnectedDropLists(): string[] {
+    return this.currentProject.columns.map(column => `drop-list-${column.id}`);
+  }
+
+  /** 追蹤任務 ID 以優化效能 */
+  trackByTaskId(index: number, task: Task): string {
+    return task.id;
+  }
+
   /** 拖拽處理 */
-  drop(event: CdkDragDrop<Task[]>, columnId: string) {
+  drop(event: CdkDragDrop<Task[]>) {
+    this.isDragOver = false;
+
     if (event.previousContainer === event.container) {
+      // 同一欄位內重新排序
       moveItemInArray(
         event.container.data,
         event.previousIndex,
         event.currentIndex
       );
     } else {
+      // 跨欄位移動
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,

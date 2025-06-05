@@ -1,0 +1,109 @@
+// src/app/kanban-board/kanban-board.component.scss
+
+/* CDK 拖拽樣式增強 */
+.cdk-drop-list {
+  transition: background-color 0.2s ease;
+}
+
+.cdk-drop-list.cdk-drop-list-receiving {
+  border-radius: 0.75rem;
+  background-color: rgb(239 246 255) !important; /* bg-blue-50 */
+}
+
+.cdk-drag {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cdk-drag-preview {
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  opacity: 0.9;
+  transform: rotate(5deg);
+}
+
+.cdk-drag-placeholder {
+  border: 2px dashed #3b82f6; /* border-blue-500 */
+  border-radius: 0.5rem;
+  background: rgb(239 246 255); /* bg-blue-50 */
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* 拖拽手柄樣式 */
+.cdk-drag-handle {
+  cursor: grab;
+}
+
+.cdk-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* 拖拽預覽動畫 */
+.cdk-drag-preview .task-card {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transform: rotate(2deg);
+}
+
+/* 拖放區域高亮 */
+.drop-zone-highlight {
+  border-color: #3b82f6 !important;
+  background-color: rgb(239 246 255) !important;
+  transition: all 0.2s ease;
+  transform: scale(1.02);
+}
+
+/* 任務卡片 hover 效果 */
+.task-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* 拖拽中的列表樣式 */
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* 響應式拖拽 */
+@media (max-width: 768px) {
+  .cdk-drag-preview {
+    transform: rotate(2deg) scale(0.95);
+  }
+}
+
+// /* 拖拽時的泳道邊框動畫 */
+// .column-container {
+//   transition: all 0.2s ease;
+// }
+
+// .column-container.drag-over {
+//   border: 2px solid #3b82f6;
+//   background-color: rgb(239 246 255);
+//   transform: scale(1.02);
+// }
+
+/* 自訂滾動條 */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  border-radius: 3px;
+  background: #f1f5f9;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #cbd5e1;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
