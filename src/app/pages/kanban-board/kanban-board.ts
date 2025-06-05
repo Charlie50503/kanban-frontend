@@ -1,5 +1,5 @@
 // src/app/kanban-board/kanban-board.component.ts
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -23,6 +23,7 @@ import { TaskDialogComponent } from './components/task-dialog/task-dialog.compon
   styleUrl: './kanban-board.scss',
 })
 export class KanbanBoard {
+  private readonly cdr = inject(ChangeDetectorRef);
   /** 專案陣列 */
   projects: Project[] = [
     {
@@ -254,6 +255,7 @@ export class KanbanBoard {
     this.projects = this.projects.map(project =>
       project.id === this.currentProject.id ? { ...this.currentProject } : project
     );
+    this.cdr.detectChanges();
   }
 
   /** 專案管理 - 切換專案 */
