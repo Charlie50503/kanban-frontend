@@ -8,7 +8,9 @@ import {
 } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Project, Task, Column } from './intefaces/task.interface';
+import { TaskDialogComponent } from './components/task-dialog/task-dialog.component';
 
 @Component({
   selector: 'app-kanban-board',
@@ -204,6 +206,8 @@ export class KanbanBoard {
 
   /** 是否正在拖拽中 */
   isDragOver: boolean = false;
+
+  constructor(private dialog: MatDialog) {}
 
   /** 產生唯一 ID */
   generateId(): string {
@@ -419,45 +423,28 @@ export class KanbanBoard {
 
   /** 任務管理 - 顯示新增任務表單 */
   showAddForm(columnId: string) {
-    this.showAddTaskColumn = columnId;
-    this.resetNewTask();
-  }
+    const dialogRef = this.dialog.open(TaskDialogComponent, {
+      width: '500px',
+      data: { columnId, isEdit: false }
+    });
 
-  /** 任務管理 - 重設新任務表單 */
-  resetNewTask() {
-    this.newTask = {
-      title: '',
-      description: '',
-      assignee: '',
-      dueDate: '',
-      priority: 'medium',
-      tags: [],
-    };
-    this.tagsInputValue = '';
-  }
-
-  /** 任務管理 - 處理標籤輸入變更 */
-  onTagsInputChange(event: Event) {
-    const target = event.target as HTMLInputElement;
-    this.tagsInputValue = target.value;
-    this.newTask.tags = target.value
-      .split(',')
-      .map((tag: string) => tag.trim())
-      .filter((tag: string) => tag.length > 0);
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.addTask(columnId, result);
+      }
+    });
   }
 
   /** 任務管理 - 新增任務 */
-  addTask(columnId: string) {
-    if (!this.newTask.title?.trim()) return;
-
+  private addTask(columnId: string, taskData: Partial<Task>) {
     const task: Task = {
       id: this.generateId(),
-      title: this.newTask.title!.trim(),
-      description: this.newTask.description || '',
-      assignee: this.newTask.assignee || '',
-      dueDate: this.newTask.dueDate || '',
-      priority: (this.newTask.priority as 'low' | 'medium' | 'high') || 'medium',
-      tags: this.newTask.tags ? [...this.newTask.tags] : [],
+      title: taskData.title!.trim(),
+      description: taskData.description || '',
+      assignee: taskData.assignee || '',
+      dueDate: taskData.dueDate || '',
+      priority: (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
+      tags: taskData.tags ? [...taskData.tags] : [],
     };
 
     this.currentProject.columns = this.currentProject.columns.map((col) =>
@@ -465,40 +452,42 @@ export class KanbanBoard {
     );
 
     this.updateCurrentProject();
-    this.showAddTaskColumn = null;
-    this.resetNewTask();
   }
 
   /** 任務管理 - 編輯任務 */
   editTask(task: Task) {
-    this.editingTask = { ...task };
-    this.newTask = { ...task };
-    this.tagsInputValue = task.tags?.join(', ') || '';
+    const dialogRef = this.dialog.open(TaskDialogComponent, {
+      width: '500px',
+      data: { task, isEdit: true }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateTask(task.id, result);
+      }
+    });
   }
 
   /** 任務管理 - 更新任務 */
-  updateTask() {
-    if (!this.editingTask || !this.newTask.title?.trim()) return;
-
+  protected updateTask(taskId: string, taskData: Partial<Task>) {
     this.currentProject.columns = this.currentProject.columns.map((col) => ({
       ...col,
       tasks: col.tasks.map((t) =>
-        t.id === this.editingTask!.id
+        t.id === taskId
           ? {
               ...t,
-              title: this.newTask.title!.trim(),
-              description: this.newTask.description || '',
-              assignee: this.newTask.assignee || '',
-              dueDate: this.newTask.dueDate || '',
-              priority: (this.newTask.priority as 'low' | 'medium' | 'high') || 'medium',
-              tags: this.newTask.tags ? [...this.newTask.tags] : [],
+              title: taskData.title!.trim(),
+              description: taskData.description || '',
+              assignee: taskData.assignee || '',
+              dueDate: taskData.dueDate || '',
+              priority: (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
+              tags: taskData.tags ? [...taskData.tags] : [],
             }
           : t
       ),
     }));
 
     this.updateCurrentProject();
-    this.cancelEdit();
   }
 
   /** 任務管理 - 取消編輯 */
@@ -535,5 +524,28 @@ export class KanbanBoard {
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString('zh-TW');
+  }
+
+  /** 任務管理 - 重設新任務表單 */
+  resetNewTask() {
+    this.newTask = {
+      title: '',
+      description: '',
+      assignee: '',
+      dueDate: '',
+      priority: 'medium',
+      tags: [],
+    };
+    this.tagsInputValue = '';
+  }
+
+  /** 任務管理 - 處理標籤輸入變更 */
+  onTagsInputChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.tagsInputValue = target.value;
+    this.newTask.tags = target.value
+      .split(',')
+      .map((tag: string) => tag.trim())
+      .filter((tag: string) => tag.length > 0);
   }
 }
