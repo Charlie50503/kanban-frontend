@@ -1,0 +1,451 @@
+<!-- src/app/kanban-board/kanban-board.component.html -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  <div class="max-w-full mx-auto">
+    <!-- 頂部專案選擇和管理 -->
+    <header class="mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Kanban 專案管理</h1>
+          <p class="text-gray-600">管理多個專案的任務看板</p>
+        </div>
+        <button
+          (click)="showCreateProjectForm()"
+          class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <!-- 資料夾新增圖示 -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          新增專案
+        </button>
+      </div>
+
+      <!-- 專案選擇器 -->
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex items-center gap-2">
+          <!-- 資料夾圖示 -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z" />
+          </svg>
+          <span class="text-gray-700 font-medium">目前專案:</span>
+        </div>
+        <select
+          [value]="currentProject.id"
+          (change)="switchProject($any($event.target).value)"
+          class="px-3 py-2 border border-gray-300 rounded-lg bg-white min-w-48"
+        >
+          <option *ngFor="let project of projects" [value]="project.id">
+            {{ project.name }}
+          </option>
+        </select>
+        <div class="flex gap-2">
+          <button
+            (click)="showEditProjectForm(currentProject)"
+            class="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+          >
+            <!-- 編輯圖示 -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+          <button
+            *ngIf="projects.length > 1"
+            (click)="deleteProject(currentProject.id)"
+            class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+          >
+            <!-- 刪除圖示 -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 專案資訊 -->
+      <div class="bg-white rounded-lg p-4 mb-4 border border-gray-200">
+        <h3 class="font-semibold text-gray-900 mb-1">{{ currentProject.name }}</h3>
+        <p class="text-gray-600 text-sm">{{ currentProject.description }}</p>
+        <p class="text-gray-400 text-xs mt-2">建立日期: {{ formatDate(currentProject.createdAt) }}</p>
+      </div>
+
+      <!-- 泳道管理 -->
+      <div class="flex items-center gap-2 mb-4">
+        <button
+          (click)="showCreateColumnForm()"
+          class="flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          新增泳道
+        </button>
+        <span class="text-gray-500 text-sm">共 {{ currentProject.columns.length }} 個泳道</span>
+      </div>
+    </header>
+
+    <!-- 水平滾動容器 -->
+    <div class="overflow-x-auto">
+      <div class="flex gap-4 min-w-max pb-4">
+        <!-- 依序渲染每個欄位 -->
+        <ng-container *ngFor="let column of getSortedColumns()">
+          <div
+            class="bg-gray-50 rounded-xl p-4 w-80 min-h-[600px] flex-shrink-0 transition-all duration-200"
+          >
+            <!-- 欄位標題與管理按鈕 -->
+            <div class="flex items-center justify-between mb-4 sticky top-0 bg-gray-50 z-10 pb-2">
+              <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full" [ngClass]="column.color"></div>
+                <h3 class="font-semibold text-gray-900">{{ column.title }}</h3>
+                <span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                  {{ column.tasks.length }}
+                </span>
+              </div>
+              <div class="flex gap-1">
+                <button
+                  (click)="showAddForm(column.id)"
+                  class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                >
+                  <!-- 新增任務圖示 -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+                <button
+                  (click)="showEditColumnForm(column)"
+                  class="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
+                >
+                  <!-- 編輯泳道圖示 -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button
+                  *ngIf="currentProject.columns.length > 1"
+                  (click)="deleteColumn(column.id)"
+                  class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                >
+                  <!-- 刪除泳道圖示 -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 任務列表 + 拖放區 -->
+            <div
+              cdkDropList
+              [cdkDropListData]="column.tasks"
+              class="space-y-2 overflow-y-auto max-h-[520px]"
+              (cdkDropListDropped)="drop($event, column.id)"
+            >
+              <!-- 顯示「新增任務表單」 -->
+              <div *ngIf="showAddTaskColumn === column.id">
+                <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-3 mb-2">
+                  <input
+                    type="text"
+                    placeholder="任務標題"
+                    [(ngModel)]="newTask.title"
+                    class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
+                  />
+                  <textarea
+                    placeholder="任務描述"
+                    [(ngModel)]="newTask.description"
+                    class="w-full p-2 border border-gray-300 rounded mb-2 text-sm h-16 resize-none"
+                  ></textarea>
+                  <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input
+                      type="text"
+                      placeholder="負責人"
+                      [(ngModel)]="newTask.assignee"
+                      class="p-2 border border-gray-300 rounded text-sm"
+                    />
+                    <input
+                      type="date"
+                      [(ngModel)]="newTask.dueDate"
+                      class="p-2 border border-gray-300 rounded text-sm"
+                    />
+                  </div>
+                  <select
+                    [(ngModel)]="newTask.priority"
+                    class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
+                  >
+                    <option value="low">低優先級</option>
+                    <option value="medium">中優先級</option>
+                    <option value="high">高優先級</option>
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="標籤 (用逗號分隔)"
+                    [value]="tagsInputValue"
+                    (input)="onTagsInputChange($event)"
+                    class="w-full p-2 border border-gray-300 rounded mb-3 text-sm"
+                  />
+                  <div class="flex gap-2">
+                    <button
+                      (click)="addTask(column.id)"
+                      class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      新增
+                    </button>
+                    <button
+                      (click)="showAddTaskColumn = null"
+                      class="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm font-medium hover:bg-gray-400 transition-colors"
+                    >
+                      取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 任務卡片 (可拖放) -->
+              <div
+                *ngFor="let task of column.tasks; let idx = index"
+                cdkDrag
+                class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 cursor-move hover:shadow-md transition-all duration-200 group"
+              >
+                <div class="flex items-start gap-2">
+                  <div class="flex-shrink-0 mt-1 text-gray-400 group-hover:text-gray-600 transition-colors">
+                    <!-- 拖拽手柄圖示 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
+                    </svg>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start mb-2">
+                      <h4
+                        class="font-semibold text-gray-900 text-sm leading-tight truncate pr-2"
+                        [title]="task.title"
+                      >
+                        {{ task.title }}
+                      </h4>
+                      <div class="flex gap-1 flex-shrink-0">
+                        <button
+                          (click)="editTask(task)"
+                          class="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        >
+                          <!-- 編輯圖示 -->
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          (click)="deleteTask(task.id)"
+                          class="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                        >
+                          <!-- 刪除圖示 -->
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <p *ngIf="task.description" class="text-gray-600 text-xs mb-2 leading-relaxed">
+                      {{ task.description }}
+                    </p>
+
+                    <div class="flex flex-wrap gap-1 mb-2">
+                      <span
+                        *ngFor="let tag of task.tags"
+                        class="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-xs font-medium"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-gray-500">
+                      <div class="flex items-center gap-2">
+                        <ng-container *ngIf="task.assignee">
+                          <div class="flex items-center gap-1">
+                            <!-- 人員圖示 -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            <span class="truncate max-w-16">{{ task.assignee }}</span>
+                          </div>
+                        </ng-container>
+                      </div>
+
+                      <div class="flex items-center gap-1">
+                        <span
+                          class="px-1.5 py-0.5 rounded border text-xs font-medium"
+                          [ngClass]="getPriorityColor(task.priority)"
+                          [title]="'優先級：' + task.priority"
+                        >
+                          {{ task.priority.charAt(0).toUpperCase() }}
+                        </span>
+                        <ng-container *ngIf="task.dueDate">
+                          <div class="flex items-center gap-1">
+                            <!-- 日曆圖示 -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-2 w-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-xs">{{ formatDate(task.dueDate) }}</span>
+                          </div>
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 空白拖放區 (顯示在沒有任務時) -->
+              <div
+                *ngIf="column.tasks.length === 0"
+                class="h-16 border-2 border-dashed border-blue-400 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-sm font-medium"
+              >
+                拖拽任務到此
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- 專案表單彈窗 -->
+    <div
+      *ngIf="showProjectForm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-4">
+          {{ editingProject ? '編輯專案' : '新增專案' }}
+        </h3>
+        <input
+          type="text"
+          placeholder="專案名稱"
+          [(ngModel)]="newProject.name"
+          class="w-full p-3 border border-gray-300 rounded mb-3"
+        />
+        <textarea
+          placeholder="專案描述"
+          [(ngModel)]="newProject.description"
+          class="w-full p-3 border border-gray-300 rounded mb-4 h-20 resize-none"
+        ></textarea>
+        <div class="flex gap-2">
+          <button
+            (click)="editingProject ? updateProject() : createProject()"
+            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
+          >
+            {{ editingProject ? '更新' : '建立' }}
+          </button>
+          <button
+            (click)="closeProjectForm()"
+            class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-400 transition-colors"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 泳道表單彈窗 -->
+    <div
+      *ngIf="showColumnForm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-lg font-semibold mb-4">
+          {{ editingColumn ? '編輯泳道' : '新增泳道' }}
+        </h3>
+        <input
+          type="text"
+          placeholder="泳道名稱"
+          [(ngModel)]="newColumn.title"
+          class="w-full p-3 border border-gray-300 rounded mb-3"
+        />
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">選擇顏色</label>
+          <div class="grid grid-cols-5 gap-2">
+            <button
+              *ngFor="let color of colorOptions"
+              (click)="newColumn.color = color"
+              class="w-8 h-8 rounded-full border-2"
+              [ngClass]="[color, newColumn.color === color ? 'border-gray-800' : 'border-gray-300']"
+            ></button>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button
+            (click)="editingColumn ? updateColumn() : createColumn()"
+            class="flex-1 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
+          >
+            {{ editingColumn ? '更新' : '建立' }}
+          </button>
+          <button
+            (click)="closeColumnForm()"
+            class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-400 transition-colors"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 編輯任務的 Modal -->
+    <div
+      *ngIf="editingTask"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+    >
+      <div class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h3 class="text-lg font-semibold mb-4">編輯任務</h3>
+        <div class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-3 mb-2">
+          <input
+            type="text"
+            placeholder="任務標題"
+            [(ngModel)]="newTask.title"
+            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
+          />
+          <textarea
+            placeholder="任務描述"
+            [(ngModel)]="newTask.description"
+            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm h-16 resize-none"
+          ></textarea>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="負責人"
+              [(ngModel)]="newTask.assignee"
+              class="p-2 border border-gray-300 rounded text-sm"
+            />
+            <input
+              type="date"
+              [(ngModel)]="newTask.dueDate"
+              class="p-2 border border-gray-300 rounded text-sm"
+            />
+          </div>
+          <select
+            [(ngModel)]="newTask.priority"
+            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
+          >
+            <option value="low">低優先級</option>
+            <option value="medium">中優先級</option>
+            <option value="high">高優先級</option>
+          </select>
+          <input
+            type="text"
+            placeholder="標籤 (用逗號分隔)"
+            [value]="tagsInputValue"
+            (input)="onTagsInputChange($event)"
+            class="w-full p-2 border border-gray-300 rounded mb-3 text-sm"
+          />
+          <div class="flex gap-2">
+            <button
+              (click)="updateTask()"
+              class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              更新
+            </button>
+            <button
+              (click)="cancelEdit()"
+              class="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm font-medium hover:bg-gray-400 transition-colors"
+            >
+              取消
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
