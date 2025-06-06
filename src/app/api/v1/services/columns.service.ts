@@ -17,6 +17,8 @@ import { apiColumnsIdPut } from '../fn/columns/api-columns-id-put';
 import { ApiColumnsIdPut$Params } from '../fn/columns/api-columns-id-put';
 import { apiProjectsProjectIdColumnsPost } from '../fn/columns/api-projects-project-id-columns-post';
 import { ApiProjectsProjectIdColumnsPost$Params } from '../fn/columns/api-projects-project-id-columns-post';
+import { apiProjectsProjectIdColumnsReorderPatch } from '../fn/columns/api-projects-project-id-columns-reorder-patch';
+import { ApiProjectsProjectIdColumnsReorderPatch$Params } from '../fn/columns/api-projects-project-id-columns-reorder-patch';
 
 @Injectable({ providedIn: 'root' })
 export class ColumnsService extends BaseService {
@@ -119,6 +121,39 @@ export class ColumnsService extends BaseService {
    */
   apiColumnsIdDelete(params: ApiColumnsIdDelete$Params, context?: HttpContext): Observable<void> {
     return this.apiColumnsIdDelete$Response(params, context).pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `apiProjectsProjectIdColumnsReorderPatch()` */
+  static readonly ApiProjectsProjectIdColumnsReorderPatchPath = '/api/projects/{projectId}/columns/reorder';
+
+  /**
+   * 重新排序專案中的欄位.
+   *
+   * 調整專案中欄位的順序
+   *
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `apiProjectsProjectIdColumnsReorderPatch()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  apiProjectsProjectIdColumnsReorderPatch$Response(params: ApiProjectsProjectIdColumnsReorderPatch$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    return apiProjectsProjectIdColumnsReorderPatch(this.http, this.rootUrl, params, context);
+  }
+
+  /**
+   * 重新排序專案中的欄位.
+   *
+   * 調整專案中欄位的順序
+   *
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `apiProjectsProjectIdColumnsReorderPatch$Response()` instead.
+   *
+   * This method sends `application/json` and handles request body of type `application/json`.
+   */
+  apiProjectsProjectIdColumnsReorderPatch(params: ApiProjectsProjectIdColumnsReorderPatch$Params, context?: HttpContext): Observable<void> {
+    return this.apiProjectsProjectIdColumnsReorderPatch$Response(params, context).pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
     );
   }
