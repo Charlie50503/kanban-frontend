@@ -26,6 +26,9 @@ import { UpdateColumnDialog } from './components/update-column-dialog/update-col
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
 import { filter, switchMap } from 'rxjs';
 import { ColumnsService } from 'src/app/api/v1/services';
+import { NewTaskDialog } from './components/new-task-dialog/new-task-dialog';
+import { UpdateTaskDialog } from './components/update-task-dialog/update-task-dialog';
+import { TasksService } from 'src/app/api/v1/services';
 
 @Component({
   selector: 'app-kanban-board',
@@ -240,6 +243,7 @@ export class KanbanBoard {
     private alertSnackbarService: AlertSnackbarService,
     private confirmDialogService: ConfirmDialogService,
     private columnsService: ColumnsService,
+    private tasksService: TasksService,
   ) {
     this.queryProjects();
   }
@@ -526,43 +530,22 @@ export class KanbanBoard {
   }
 
   /** 任務管理 - 顯示新增任務表單 */
-  showAddForm(columnId: string) {
-    const dialogRef = this.dialog.open(TaskDialogComponent, {
-      width: '500px',
-      data: { columnId, isEdit: false },
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.addTask(columnId, result);
-      }
-    });
+  openAddTaskDialog(columnId: string) {
+    this.dialog
+      .open(NewTaskDialog, {
+        data: { projectId: this.currentProjectSignal()!.id!, columnId },
+      })
+      .afterClosed()
+      .pipe(filter((res) => !!res))
+      .subscribe((result) => {
+        this.getProjectDetail(this.currentProjectSignal()!.id!);
+      });
   }
 
-  /** 任務管理 - 新增任務 */
-  private addTask(columnId: string, taskData: Partial<Task>) {
-    const task: Task = {
-      id: this.generateId(),
-      title: taskData.title!.trim(),
-      description: taskData.description || '',
-      assignee: taskData.assignee || '',
-      dueDate: taskData.dueDate || '',
-      priority: (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
-      tags: taskData.tags ? [...taskData.tags] : [],
-    };
-
-    this.currentProject.columns = this.currentProject.columns!.map((col) =>
-      col.id === columnId ? { ...col, tasks: [...col.tasks!, task] } : col,
-    );
-
-    this.updateCurrentProject();
-  }
-
-  /** 任務管理 - 編輯任務 */
-  editTask(task: Task) {
-    const dialogRef = this.dialog.open(TaskDialogComponent, {
-      width: '500px',
-      data: { task, isEdit: true },
+  /** 任務管理 - 顯示編輯任務表單 */
+  showEditForm(task: Task) {
+    const dialogRef = this.dialog.open(UpdateTaskDialog, {
+      data: { task },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -572,28 +555,41 @@ export class KanbanBoard {
     });
   }
 
+  /** 任務管理 - 新增任務 */
+  private addTask(columnId: string, taskData: Partial<Task>) {
+    // this.tasksService
+    //   .apiColumnsColumnIdTasksPost({
+    //     columnId,
+    //     body: taskData,
+    //   })
+    //   .subscribe({
+    //     next: () => {
+    //       this.getProjectDetail(this.currentProjectSignal()!.id!);
+    //     },
+    //     error: () => {
+    //       this.alertSnackbarService.onAttachRequestFailed();
+    //     },
+    //   });
+  }
+
   /** 任務管理 - 更新任務 */
   protected updateTask(taskId: string, taskData: Partial<Task>) {
-    this.currentProject.columns = this.currentProject.columns!.map((col) => ({
-      ...col,
-      tasks: col.tasks!.map((t) =>
-        t.id === taskId
-          ? {
-              ...t,
-              title: taskData.title!.trim(),
-              description: taskData.description || '',
-              assignee: taskData.assignee || '',
-              dueDate: taskData.dueDate || '',
-              priority:
-                (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
-              tags: taskData.tags ? [...taskData.tags] : [],
-            }
-          : t,
-      ),
-    }));
-
-    this.updateCurrentProject();
+    // this.tasksService
+    //   .apiTasksIdPut({
+    //     id: taskId,
+    //     body: taskData,
+    //   })
+    //   .subscribe({
+    //     next: () => {
+    //       this.getProjectDetail(this.currentProjectSignal()!.id!);
+    //     },
+    //     error: () => {
+    //       this.alertSnackbarService.onAttachRequestFailed();
+    //     },
+    //   });
   }
+
+  protected editTask(task: Task) {}
 
   /** 任務管理 - 取消編輯 */
   cancelEdit() {
