@@ -16,6 +16,7 @@ import { TaskDialogComponent } from './components/task-dialog/task-dialog.compon
 import { NewProjectDialog } from './components/new-project-dialog/new-project-dialog';
 import { Column, Project, Task } from 'src/app/api/v1/models';
 import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
+import { UpdateColumnDialog } from './components/update-column-dialog/update-column-dialog';
 
 @Component({
   selector: 'app-kanban-board',
@@ -424,9 +425,21 @@ export class KanbanBoard {
 
   /** 泳道管理 - 顯示編輯泳道表單 */
   showEditColumnForm(column: Column) {
-    this.editingColumn = column;
-    this.newColumn = { title: column.title, color: column.color };
-    this.showColumnForm = true;
+    if (!this.currentProjectSignal()) return;
+
+    this.dialog
+      .open(UpdateColumnDialog, {
+        data: {
+          projectId: this.currentProjectSignal()!.id!,
+          column,
+        },
+      })
+      .afterClosed()
+      .subscribe((res) => {
+        if (res) {
+          this.getProjectDetail(this.currentProjectSignal()!.id!);
+        }
+      });
   }
 
   /** 泳道管理 - 建立泳道 */
