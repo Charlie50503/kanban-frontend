@@ -4,8 +4,6 @@ import {
   provideZonelessChangeDetection,
   importProvidersFrom,
   LOCALE_ID,
-  provideZoneChangeDetection,
-
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
@@ -41,7 +39,6 @@ export const appConfig: ApplicationConfig = {
       }),
       NgxSpinnerModule,
     ]),
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(withInterceptors([apiInterceptor, spinnerInterceptor])),
