@@ -56,7 +56,7 @@
           class="px-3 py-2 border border-gray-300 rounded-lg bg-white min-w-48"
         >
           @for (project of projectsSignal(); track project.id) {
-            <option [value]="project.id">{{ project.name }}</option>
+          <option [value]="project.id">{{ project.name }}</option>
           }
         </select>
         <div class="flex gap-2">
@@ -109,7 +109,9 @@
         <h3 class="font-semibold text-gray-900 mb-1">
           {{ currentProjectSignal()?.name }}
         </h3>
-        <p class="text-gray-600 text-sm">{{ currentProjectSignal()?.description }}</p>
+        <p class="text-gray-600 text-sm">
+          {{ currentProjectSignal()?.description }}
+        </p>
         <p class="text-gray-400 text-xs mt-2">
           建立日期: {{ formatDate(currentProjectSignal()?.createdAt!) }}
         </p>
@@ -138,15 +140,15 @@
           新增泳道
         </button>
         @if (currentProjectSignal()!=null) {
-          <span class="text-gray-500 text-sm"
-            >共 {{ currentProjectSignal()!.columns!.length }} 個泳道</span
-          >
+        <span class="text-gray-500 text-sm"
+          >共 {{ currentProjectSignal()!.columns!.length }} 個泳道</span
+        >
         }
       </div>
     </header>
 
     <!-- 水平滾動容器 -->
-     @if (currentProjectSignal()) {
+    @if (currentProjectSignal()) {
     <div class="flex-1 overflow-x-auto">
       <div class="flex gap-4 p-4">
         <ng-container *ngFor="let column of sortedColumnsSignal()">
@@ -357,78 +359,6 @@
         </ng-container>
       </div>
     </div>
-     }
-
-
-
-
-    <!-- 編輯任務的 Modal -->
-    <div
-      *ngIf="editingTask"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-    >
-      <div
-        class="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
-      >
-        <h3 class="text-lg font-semibold mb-4">編輯任務</h3>
-        <div
-          class="bg-white rounded-lg border-2 border-dashed border-gray-300 p-3 mb-2"
-        >
-          <input
-            type="text"
-            placeholder="任務標題"
-            [(ngModel)]="newTask.title"
-            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
-          />
-          <textarea
-            placeholder="任務描述"
-            [(ngModel)]="newTask.description"
-            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm h-16 resize-none"
-          ></textarea>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="負責人"
-              [(ngModel)]="newTask.assignee"
-              class="p-2 border border-gray-300 rounded text-sm"
-            />
-            <input
-              type="date"
-              [(ngModel)]="newTask.dueDate"
-              class="p-2 border border-gray-300 rounded text-sm"
-            />
-          </div>
-          <select
-            [(ngModel)]="newTask.priority"
-            class="w-full p-2 border border-gray-300 rounded mb-2 text-sm"
-          >
-            <option value="low">低優先級</option>
-            <option value="medium">中優先級</option>
-            <option value="high">高優先級</option>
-          </select>
-          <input
-            type="text"
-            placeholder="標籤 (用逗號分隔)"
-            [value]="tagsInputValue"
-            (input)="onTagsInputChange($event)"
-            class="w-full p-2 border border-gray-300 rounded mb-3 text-sm"
-          />
-          <div class="flex gap-2">
-            <button
-              (click)="updateTask(newTask.id!, newTask)"
-              class="flex-1 bg-blue-600 text-white px-3 py-2 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
-            >
-              更新
-            </button>
-            <button
-              (click)="cancelEdit()"
-              class="flex-1 bg-gray-300 text-gray-700 px-3 py-2 rounded text-sm font-medium hover:bg-gray-400 transition-colors"
-            >
-              取消
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    }
   </div>
 </div>

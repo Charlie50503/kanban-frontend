@@ -255,9 +255,9 @@ export class KanbanBoard {
 
   /** 取得所有連接的拖放列表 ID */
   getConnectedDropLists(): string[] {
-    return this.currentProject.columns!.map(
+    return this.sortedColumnsSignal()?.map(
       (column) => `drop-list-${column.id}`,
-    );
+    ) || [];
   }
 
   /** 追蹤任務 ID 以優化效能 */
@@ -267,6 +267,8 @@ export class KanbanBoard {
 
   /** 拖拽處理 */
   drop(event: CdkDragDrop<Task[] | undefined>) {
+    console.log(event);
+
     if (event.previousContainer === event.container) {
       // 在同一個泳道內移動
       moveItemInArray(
@@ -297,7 +299,9 @@ export class KanbanBoard {
         })
         .subscribe({
           next: () => {
-            this.alertSnackbarService.onCustomSucceededMessage('任務已移動到新的泳道');
+            this.alertSnackbarService.onCustomSucceededMessage(
+              '任務已移動到新的泳道',
+            );
           },
           error: (error) => {
             this.alertSnackbarService.onCustomFailedMessage('移動任務失敗');
@@ -569,11 +573,12 @@ export class KanbanBoard {
       data: { task },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.updateTask(task.id!, result);
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(filter((res) => !!res))
+      .subscribe((result) => {
+        this.getProjectDetail(this.currentProjectSignal()!.id!);
+      });
   }
 
   /** 任務管理 - 新增任務 */
