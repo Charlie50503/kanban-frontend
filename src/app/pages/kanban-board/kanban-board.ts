@@ -1,5 +1,7 @@
+import { AlertSnackbarService } from './../../commons/shared/alert-snackbar/alert-snackbar.service';
+import { ProjectsService } from './../../api/v1/services/projects.service';
 // src/app/kanban-board/kanban-board.component.ts
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -9,22 +11,28 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Project, Task, Column } from './intefaces/task.interface';
+// import { Project, Task, Column } from './intefaces/task.interface';
 import { TaskDialogComponent } from './components/task-dialog/task-dialog.component';
+import { NewProjectDialog } from './components/new-project-dialog/new-project-dialog';
+import { Column, Project, Task } from 'src/app/api/v1/models';
+import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
 
 @Component({
   selector: 'app-kanban-board',
-  imports: [
-    CommonModule,
-    FormsModule,
-    DragDropModule,
-  ],
+  imports: [CommonModule, FormsModule, DragDropModule],
   templateUrl: './kanban-board.html',
   styleUrl: './kanban-board.scss',
 })
 export class KanbanBoard {
   private readonly cdr = inject(ChangeDetectorRef);
   /** 專案陣列 */
+  protected projectsSignal = signal<Project[]>([]);
+
+  protected sortedColumnsSignal = computed(() => {
+    return this.currentProjectSignal()?.columns!.sort(
+      (a, b) => a.order - b.order,
+    );
+  });
   projects: Project[] = [
     {
       id: 'project-1',
@@ -154,6 +162,7 @@ export class KanbanBoard {
 
   /** 目前選中的專案 */
   currentProject: Project = this.projects[0];
+  protected currentProjectSignal = signal<Project | null>(null);
 
   /** 目前正在哪個欄位顯示「新增任務表單」 */
   showAddTaskColumn: string | null = null;
@@ -200,15 +209,28 @@ export class KanbanBoard {
 
   /** 顏色選項 */
   colorOptions: string[] = [
-    'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
-    'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-orange-500',
-    'bg-teal-500', 'bg-gray-500'
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-yellow-500',
+    'bg-red-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+    'bg-orange-500',
+    'bg-teal-500',
+    'bg-gray-500',
   ];
 
   /** 是否正在拖拽中 */
   isDragOver: boolean = false;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(
+    private dialog: MatDialog,
+    private projectsService: ProjectsService,
+    private alertSnackbarService: AlertSnackbarService,
+  ) {
+    this.queryProjects();
+  }
 
   /** 產生唯一 ID */
   generateId(): string {
@@ -217,67 +239,81 @@ export class KanbanBoard {
 
   /** 取得所有連接的拖放列表 ID */
   getConnectedDropLists(): string[] {
-    return this.currentProject.columns.map(column => `drop-list-${column.id}`);
+    return this.currentProject.columns!.map(
+      (column) => `drop-list-${column.id}`,
+    );
   }
 
   /** 追蹤任務 ID 以優化效能 */
   trackByTaskId(index: number, task: Task): string {
-    return task.id;
+    return task.id!;
   }
 
   /** 拖拽處理 */
-  drop(event: CdkDragDrop<Task[]>) {
-    this.isDragOver = false;
+  drop(event: CdkDragDrop<Task[] | undefined>) {
+    if (event != undefined) {
+      this.isDragOver = false;
 
-    if (event.previousContainer === event.container) {
-      // 同一欄位內重新排序
-      moveItemInArray(
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-    } else {
-      // 跨欄位移動
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
+      if (event.previousContainer === event.container) {
+        // 同一欄位內重新排序
+        moveItemInArray(
+          event.container.data!,
+          event.previousIndex,
+          event.currentIndex,
+        );
+      } else {
+        // 跨欄位移動
+        transferArrayItem(
+          event.previousContainer.data!,
+          event.container.data!,
+          event.previousIndex,
+          event.currentIndex,
+        );
+      }
+
+      // 更新專案資料
+      this.updateCurrentProject();
     }
-
-    // 更新專案資料
-    this.updateCurrentProject();
   }
 
   /** 更新目前專案資料到專案陣列 */
   updateCurrentProject() {
-    this.projects = this.projects.map(project =>
-      project.id === this.currentProject.id ? { ...this.currentProject } : project
+    this.projects = this.projects.map((project) =>
+      project.id === this.currentProject.id
+        ? { ...this.currentProject }
+        : project,
     );
     this.cdr.detectChanges();
   }
 
   /** 專案管理 - 切換專案 */
   switchProject(projectId: string) {
-    const project = this.projects.find(p => p.id === projectId);
-    if (project) {
-      this.currentProject = project;
-    }
+    // const project = this.projects.find((p) => p.id === projectId);
+    // if (project) {
+    //   this.currentProject = project;
+    // }
+
+    this.getProjectDetail(projectId);
   }
 
   /** 專案管理 - 顯示新增專案表單 */
-  showCreateProjectForm() {
-    this.showProjectForm = true;
-    this.editingProject = null;
-    this.newProject = { name: '', description: '' };
+  openCreateProjectDialog() {
+    // this.showProjectForm = true;
+    // this.editingProject = null;
+    // this.newProject = { name: '', description: '' };
+    this.dialog
+      .open(NewProjectDialog)
+      .afterClosed()
+      .subscribe((res) => {
+        this.queryProjects();
+      });
   }
 
   /** 專案管理 - 顯示編輯專案表單 */
-  showEditProjectForm(project: Project) {
-    this.editingProject = project;
-    this.newProject = { name: project.name, description: project.description };
-    this.showProjectForm = true;
+  showEditProjectForm() {
+    // this.editingProject = project;
+    // this.newProject = { name: project.name, description: project.description };
+    // this.showProjectForm = true;
   }
 
   /** 專案管理 - 建立專案 */
@@ -295,23 +331,23 @@ export class KanbanBoard {
           title: 'To Do',
           color: 'bg-blue-500',
           order: 1,
-          tasks: []
+          tasks: [],
         },
         {
           id: this.generateId(),
           title: 'In Progress',
           color: 'bg-yellow-500',
           order: 2,
-          tasks: []
+          tasks: [],
         },
         {
           id: this.generateId(),
           title: 'Done',
           color: 'bg-green-500',
           order: 3,
-          tasks: []
-        }
-      ]
+          tasks: [],
+        },
+      ],
     };
 
     this.projects.push(project);
@@ -323,17 +359,21 @@ export class KanbanBoard {
   updateProject() {
     if (!this.editingProject || !this.newProject.name?.trim()) return;
 
-    this.projects = this.projects.map(p =>
+    this.projects = this.projects.map((p) =>
       p.id === this.editingProject!.id
-        ? { ...p, name: this.newProject.name!, description: this.newProject.description || '' }
-        : p
+        ? {
+            ...p,
+            name: this.newProject.name!,
+            description: this.newProject.description || '',
+          }
+        : p,
     );
 
     if (this.currentProject.id === this.editingProject.id) {
       this.currentProject = {
         ...this.currentProject,
         name: this.newProject.name!,
-        description: this.newProject.description || ''
+        description: this.newProject.description || '',
       };
     }
 
@@ -341,28 +381,45 @@ export class KanbanBoard {
   }
 
   /** 專案管理 - 刪除專案 */
-  deleteProject(projectId: string) {
-    if (this.projects.length <= 1) return; // 至少保留一個專案
-
-    this.projects = this.projects.filter(p => p.id !== projectId);
-
-    if (this.currentProject.id === projectId) {
-      this.currentProject = this.projects[0];
-    }
+  deleteProject(projectId?: string) {
+    if (projectId == null) return; // 至少保留一個專案
+    this.projectsService.apiProjectsIdDelete({ id: projectId }).subscribe({
+      next: (res) => {
+        this.alertSnackbarService.onDeleteRequestSucceeded();
+        this.queryProjects();
+      },
+      error: (error: any) => this.alertSnackbarService.onDeleteRequestFailed(),
+    });
   }
 
   /** 專案管理 - 關閉專案表單 */
   closeProjectForm() {
-    this.showProjectForm = false;
-    this.editingProject = null;
-    this.newProject = { name: '', description: '' };
+    this.dialog
+      .open(NewProjectDialog)
+      .afterClosed()
+      .subscribe((res) => {});
+    // this.showProjectForm = false;
+    // this.editingProject = null;
+    // this.newProject = { name: '', description: '' };
   }
 
   /** 泳道管理 - 顯示新增泳道表單 */
-  showCreateColumnForm() {
-    this.showColumnForm = true;
-    this.editingColumn = null;
-    this.newColumn = { title: '', color: 'bg-blue-500' };
+  openCreateColumnDialog() {
+    if (!this.currentProjectSignal()) return;
+
+    this.dialog
+      .open(NewColumnDialog, {
+        data: {
+          projectId: this.currentProjectSignal()!.id!,
+          columnSize: this.currentProjectSignal()!.columns!.length,
+        },
+      })
+      .afterClosed()
+      .subscribe((res) => {
+        if (res) {
+          this.getProjectDetail(this.currentProjectSignal()!.id!);
+        }
+      });
   }
 
   /** 泳道管理 - 顯示編輯泳道表單 */
@@ -380,11 +437,11 @@ export class KanbanBoard {
       id: this.generateId(),
       title: this.newColumn.title,
       color: this.newColumn.color || 'bg-blue-500',
-      order: this.currentProject.columns.length + 1,
-      tasks: []
+      order: this.currentProject.columns!.length + 1,
+      tasks: [],
     };
 
-    this.currentProject.columns.push(column);
+    this.currentProject.columns!.push(column);
     this.updateCurrentProject();
     this.closeColumnForm();
   }
@@ -393,10 +450,10 @@ export class KanbanBoard {
   updateColumn() {
     if (!this.editingColumn || !this.newColumn.title?.trim()) return;
 
-    this.currentProject.columns = this.currentProject.columns.map(col =>
+    this.currentProject.columns = this.currentProject.columns!.map((col) =>
       col.id === this.editingColumn!.id
         ? { ...col, title: this.newColumn.title!, color: this.newColumn.color! }
-        : col
+        : col,
     );
 
     this.updateCurrentProject();
@@ -405,9 +462,11 @@ export class KanbanBoard {
 
   /** 泳道管理 - 刪除泳道 */
   deleteColumn(columnId: string) {
-    if (this.currentProject.columns.length <= 1) return; // 至少保留一個泳道
+    if (this.currentProject.columns!.length <= 1) return; // 至少保留一個泳道
 
-    this.currentProject.columns = this.currentProject.columns.filter(col => col.id !== columnId);
+    this.currentProject.columns = this.currentProject.columns!.filter(
+      (col) => col.id !== columnId,
+    );
     this.updateCurrentProject();
   }
 
@@ -420,17 +479,17 @@ export class KanbanBoard {
 
   /** 取得排序後的泳道 */
   getSortedColumns(): Column[] {
-    return [...this.currentProject.columns].sort((a, b) => a.order - b.order);
+    return [...this.currentProject.columns!].sort((a, b) => a.order - b.order);
   }
 
   /** 任務管理 - 顯示新增任務表單 */
   showAddForm(columnId: string) {
     const dialogRef = this.dialog.open(TaskDialogComponent, {
       width: '500px',
-      data: { columnId, isEdit: false }
+      data: { columnId, isEdit: false },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.addTask(columnId, result);
       }
@@ -449,8 +508,8 @@ export class KanbanBoard {
       tags: taskData.tags ? [...taskData.tags] : [],
     };
 
-    this.currentProject.columns = this.currentProject.columns.map((col) =>
-      col.id === columnId ? { ...col, tasks: [...col.tasks, task] } : col
+    this.currentProject.columns = this.currentProject.columns!.map((col) =>
+      col.id === columnId ? { ...col, tasks: [...col.tasks!, task] } : col,
     );
 
     this.updateCurrentProject();
@@ -460,21 +519,21 @@ export class KanbanBoard {
   editTask(task: Task) {
     const dialogRef = this.dialog.open(TaskDialogComponent, {
       width: '500px',
-      data: { task, isEdit: true }
+      data: { task, isEdit: true },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.updateTask(task.id, result);
+        this.updateTask(task.id!, result);
       }
     });
   }
 
   /** 任務管理 - 更新任務 */
   protected updateTask(taskId: string, taskData: Partial<Task>) {
-    this.currentProject.columns = this.currentProject.columns.map((col) => ({
+    this.currentProject.columns = this.currentProject.columns!.map((col) => ({
       ...col,
-      tasks: col.tasks.map((t) =>
+      tasks: col.tasks!.map((t) =>
         t.id === taskId
           ? {
               ...t,
@@ -482,10 +541,11 @@ export class KanbanBoard {
               description: taskData.description || '',
               assignee: taskData.assignee || '',
               dueDate: taskData.dueDate || '',
-              priority: (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
+              priority:
+                (taskData.priority as 'low' | 'medium' | 'high') || 'medium',
               tags: taskData.tags ? [...taskData.tags] : [],
             }
-          : t
+          : t,
       ),
     }));
 
@@ -500,9 +560,9 @@ export class KanbanBoard {
 
   /** 任務管理 - 刪除任務 */
   deleteTask(taskId: string) {
-    this.currentProject.columns = this.currentProject.columns.map((col) => ({
+    this.currentProject.columns = this.currentProject.columns!.map((col) => ({
       ...col,
-      tasks: col.tasks.filter((t) => t.id !== taskId),
+      tasks: col.tasks!.filter((t) => t.id !== taskId),
     }));
 
     this.updateCurrentProject();
@@ -549,5 +609,24 @@ export class KanbanBoard {
       .split(',')
       .map((tag: string) => tag.trim())
       .filter((tag: string) => tag.length > 0);
+  }
+
+  protected queryProjects() {
+    this.projectsService.apiProjectsGet().subscribe({
+      next: (res) => {
+        this.projectsSignal.set(res as Project[]);
+        // this.cdr.detectChanges();
+      },
+      error: (error: any) => this.alertSnackbarService.onQueryRequestFailed(),
+    });
+  }
+
+  private getProjectDetail(id: string) {
+    this.projectsService.apiProjectsIdGet({ id: id }).subscribe({
+      next: (res) => {
+        this.currentProjectSignal.set(res as Project);
+      },
+      error: (error: any) => this.alertSnackbarService.onQueryRequestFailed(),
+    });
   }
 }
