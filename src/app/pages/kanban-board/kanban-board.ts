@@ -1,7 +1,13 @@
 import { AlertSnackbarService } from './../../commons/shared/alert-snackbar/alert-snackbar.service';
 import { ProjectsService } from './../../api/v1/services/projects.service';
 // src/app/kanban-board/kanban-board.component.ts
-import { ChangeDetectorRef, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   CdkDragDrop,
   DragDropModule,
@@ -17,6 +23,9 @@ import { NewProjectDialog } from './components/new-project-dialog/new-project-di
 import { Column, Project, Task } from 'src/app/api/v1/models';
 import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
 import { UpdateColumnDialog } from './components/update-column-dialog/update-column-dialog';
+import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
+import { filter } from 'rxjs';
+import { ColumnsService } from 'src/app/api/v1/services';
 
 @Component({
   selector: 'app-kanban-board',
@@ -229,6 +238,8 @@ export class KanbanBoard {
     private dialog: MatDialog,
     private projectsService: ProjectsService,
     private alertSnackbarService: AlertSnackbarService,
+    private confirmDialogService: ConfirmDialogService,
+    private columnsService: ColumnsService,
   ) {
     this.queryProjects();
   }
@@ -475,12 +486,24 @@ export class KanbanBoard {
 
   /** 泳道管理 - 刪除泳道 */
   deleteColumn(columnId: string) {
-    if (this.currentProject.columns!.length <= 1) return; // 至少保留一個泳道
-
-    this.currentProject.columns = this.currentProject.columns!.filter(
-      (col) => col.id !== columnId,
-    );
-    this.updateCurrentProject();
+    this.confirmDialogService
+      .onDeleteConfirm()
+      .afterClosed()
+      .pipe(filter((res) => !!res))
+      .subscribe((res) => {
+        this.columnsService
+          .apiColumnsIdDelete({
+            id: columnId,
+          })
+          .subscribe({
+            next: (res) => {
+              this.alertSnackbarService.onDeleteRequestSucceeded();
+              this.getProjectDetail(this.currentProjectSignal()!.id!);
+            },
+            error: (error: any) =>
+              this.alertSnackbarService.onDeleteRequestFailed(),
+          });
+      });
   }
 
   /** 泳道管理 - 關閉泳道表單 */
