@@ -14,9 +14,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { UserService } from '../../../core/services/user.service';
 import { TokenService } from '../../../core/services/token.service';
-import { LoginService } from 'src/app/api/v1/services';
+// import { LoginService } from 'src/app/api/v1/services';
 import { AlertDialogComponent } from 'src/app/commons/shared/alert-dialog/alert-dialog.component';
-import { UserInfo } from 'src/app/api/v1/models';
+// import { UserInfo } from 'src/app/api/v1/models';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -47,7 +47,7 @@ export class LoginComponent {
   });
 
   constructor(
-    private loginService: LoginService,
+    // private loginService: LoginService,
     private router: Router,
     public dialogRef: MatDialog,
     private userService: UserService,
@@ -61,30 +61,30 @@ export class LoginComponent {
 
   // 登入
   public LoginUI() {
-    if (this.loginFormGroup.invalid) {
-      this.loginFormGroup.markAllAsTouched();
-      return;
-    }
+    // if (this.loginFormGroup.invalid) {
+    //   this.loginFormGroup.markAllAsTouched();
+    //   return;
+    // }
 
-    this.loginService
-      .loginAuthorizeUser$Json({
-        body: this.loginFormGroup.getRawValue(),
-      })
-      .subscribe({
-        next: (res) => this.handlingLoginSuccess(res),
-        error: (error: any) => this.handlingLoginFailed(error),
-      });
+    // this.loginService
+    //   .loginAuthorizeUser$Json({
+    //     body: this.loginFormGroup.getRawValue(),
+    //   })
+    //   .subscribe({
+    //     next: (res) => this.handlingLoginSuccess(res),
+    //     error: (error: any) => this.handlingLoginFailed(error),
+    //   });
   }
   // windows登入
   public windowsLogin() {
-    this.tokenService.removeAllAccessToken();
-    this.loginService.loginWindowsLogin$Json({}).subscribe({
-      next: (res) => this.handlingLoginSuccess(res),
-      error: (error: any) => this.handlingLoginFailed(error),
-    });
+    // this.tokenService.removeAllAccessToken();
+    // this.loginService.loginWindowsLogin$Json({}).subscribe({
+    //   next: (res) => this.handlingLoginSuccess(res),
+    //   error: (error: any) => this.handlingLoginFailed(error),
+    // });
   }
 
-  private handlingLoginSuccess(res: UserInfo) {
+  private handlingLoginSuccess(res: any) {
     // 填入使用者資料
     this.userService.setUserInfo(res);
     // 設定token
