@@ -1,0 +1,7 @@
+{
+  "quoteProps": "consistent",
+  "singleQuote": false,
+  "printWidth": 120,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "endOfLine": "crlf"
+}
