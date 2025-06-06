@@ -10,7 +10,7 @@
     "test": "ng test",
     "format": "prettier --write \"src/**/*\"",
     "clean:api": "del-cli --force src/app/api/v*",
-    "apigen:v1": "ng-openapi-gen --input http://localhost:22437/swagger/v1/swagger.json --output src/app/api/v1",
+    "apigen:v1": "ng-openapi-gen --input http://localhost:3000/api-docs.json --output src/app/api/v1",
     "apigen": "npm run clean:api & npm run apigen:v1"
   },
   "private": true,
