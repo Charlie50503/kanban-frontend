@@ -141,7 +141,7 @@
         </button>
         @if (currentProjectSignal()!=null) {
         <span class="text-gray-500 text-sm"
-          >共 {{ currentProjectSignal()!.columns!.length }} 個泳道</span
+          >共 {{ currentProjectSignal()!.columns?.length ?? 0 }} 個泳道</span
         >
         }
       </div>

@@ -243,7 +243,7 @@ export class KanbanBoard {
     private columnsService: ColumnsService,
     private tasksService: TasksService,
   ) {
-    this.queryProjects();
+    this.initQueryProjects();
   }
 
   /** 產生唯一 ID */
@@ -689,6 +689,20 @@ export class KanbanBoard {
       .map((tag: string) => tag.trim())
       .filter((tag: string) => tag.length > 0);
   }
+
+  protected initQueryProjects() {
+    this.projectsService.apiProjectsGet().subscribe({
+      next: (res) => {
+        this.projectsSignal.set(res as Project[]);
+        if (res.length > 0) {
+          this.currentProjectSignal.set(res[0] as Project);
+        }
+        // this.cdr.detectChanges();
+      },
+      error: (error: any) => this.alertSnackbarService.onQueryRequestFailed(),
+    });
+  }
+
 
   protected queryProjects() {
     this.projectsService.apiProjectsGet().subscribe({
