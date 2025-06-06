@@ -22,6 +22,7 @@ import { NewTaskDialog } from './components/new-task-dialog/new-task-dialog';
 import { UpdateTaskDialog } from './components/update-task-dialog/update-task-dialog';
 import { TasksService } from 'src/app/api/v1/services';
 import { TaskCard } from './components/task-card/task-card';
+import { UpdateProjectDialog } from './components/update-project-dialog/update-project-dialog';
 
 @Component({
   selector: 'app-kanban-board',
@@ -142,8 +143,20 @@ export class KanbanBoard {
   }
 
   /** 專案管理 - 顯示編輯專案表單 */
-  showEditProjectForm() {
+  openUpdateProjectDialog() {
     // TODO
+    this.dialog
+      .open(UpdateProjectDialog,{
+        data: {
+          project: this.currentProjectSignal(),
+        },
+      })
+      .afterClosed()
+      .pipe(filter((res) => !!res))
+      .subscribe((res) => {
+        this.queryProjects();
+        this.getProjectDetail(this.currentProjectSignal()!.id!);
+      });
     // this.editingProject = project;
     // this.newProject = { name: project.name, description: project.description };
     // this.showProjectForm = true;

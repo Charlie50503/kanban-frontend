@@ -1,0 +1,35 @@
+<!-- 專案表單彈窗 -->
+<form [formGroup]="formGroup">
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+  >
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h3 class="text-lg font-semibold mb-4">{{ '編輯專案' }}</h3>
+      <input
+        type="text"
+        placeholder="專案名稱"
+        formControlName="name"
+        class="w-full p-3 border border-gray-300 rounded mb-3"
+      />
+      <textarea
+        placeholder="專案描述"
+        formControlName="description"
+        class="w-full p-3 border border-gray-300 rounded mb-4 h-20 resize-none"
+      ></textarea>
+      <div class="flex gap-2">
+        <button
+          (click)="onSubmit()"
+          class="flex-1 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
+        >
+          {{ '更新' }}
+        </button>
+        <button
+          (click)="onCancel()"
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-400 transition-colors"
+        >
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
