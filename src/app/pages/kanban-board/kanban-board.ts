@@ -24,7 +24,7 @@ import { Column, Project, Task } from 'src/app/api/v1/models';
 import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
 import { UpdateColumnDialog } from './components/update-column-dialog/update-column-dialog';
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
-import { filter } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
 import { ColumnsService } from 'src/app/api/v1/services';
 
 @Component({
@@ -395,13 +395,23 @@ export class KanbanBoard {
   /** 專案管理 - 刪除專案 */
   deleteProject(projectId?: string) {
     if (projectId == null) return; // 至少保留一個專案
-    this.projectsService.apiProjectsIdDelete({ id: projectId }).subscribe({
-      next: (res) => {
-        this.alertSnackbarService.onDeleteRequestSucceeded();
-        this.queryProjects();
-      },
-      error: (error: any) => this.alertSnackbarService.onDeleteRequestFailed(),
-    });
+    this.confirmDialogService
+      .onDeleteConfirm()
+      .afterClosed()
+      .pipe(
+        filter((res) => !!res),
+        switchMap(() =>
+          this.projectsService.apiProjectsIdDelete({ id: projectId }),
+        ),
+      )
+      .subscribe({
+        next: (res) => {
+          this.alertSnackbarService.onDeleteRequestSucceeded();
+          this.queryProjects();
+        },
+        error: (error: any) =>
+          this.alertSnackbarService.onDeleteRequestFailed(),
+      });
   }
 
   /** 專案管理 - 關閉專案表單 */
@@ -410,9 +420,6 @@ export class KanbanBoard {
       .open(NewProjectDialog)
       .afterClosed()
       .subscribe((res) => {});
-    // this.showProjectForm = false;
-    // this.editingProject = null;
-    // this.newProject = { name: '', description: '' };
   }
 
   /** 泳道管理 - 顯示新增泳道表單 */
