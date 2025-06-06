@@ -17,8 +17,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { Task } from 'src/app/api/v1/models';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 
 export interface NewTaskDialogInput {
   projectId: string;
@@ -37,8 +36,8 @@ export interface NewTaskDialogInput {
     MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
-    MatNativeDateModule,
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './new-task-dialog.html',
   styleUrl: './new-task-dialog.scss',
 })

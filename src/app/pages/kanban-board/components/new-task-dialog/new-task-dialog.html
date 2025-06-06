@@ -23,11 +23,25 @@
           formControlName="assignee"
           class="w-full p-3 border border-gray-300 rounded"
         />
-        <input
-          type="date"
-          formControlName="dueDate"
-          class="w-full p-3 border border-gray-300 rounded"
-        />
+        <div>
+          <mat-form-field
+            class="w-full"
+            appearance="outline"
+            subscriptSizing="dynamic"
+          >
+            <input
+              matInput
+              [matDatepicker]="picker"
+              formControlName="dueDate"
+              placeholder="截止日期"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
       </div>
       <select
         formControlName="priority"
