@@ -1,0 +1,62 @@
+<!-- 任務表單彈窗 -->
+<form [formGroup]="formGroup">
+  <div
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+  >
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h3 class="text-lg font-semibold mb-4">{{ '編輯任務' }}</h3>
+      <input
+        type="text"
+        placeholder="任務標題"
+        formControlName="title"
+        class="w-full p-3 border border-gray-300 rounded mb-3"
+      />
+      <textarea
+        placeholder="任務描述"
+        formControlName="description"
+        class="w-full p-3 border border-gray-300 rounded mb-4 h-20 resize-none"
+      ></textarea>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="負責人"
+          formControlName="assignee"
+          class="w-full p-3 border border-gray-300 rounded"
+        />
+        <input
+          type="date"
+          formControlName="dueDate"
+          class="w-full p-3 border border-gray-300 rounded"
+        />
+      </div>
+      <select
+        formControlName="priority"
+        class="w-full p-3 border border-gray-300 rounded mb-4"
+      >
+        <option value="low">低優先級</option>
+        <option value="medium">中優先級</option>
+        <option value="high">高優先級</option>
+      </select>
+      <input
+        type="text"
+        placeholder="使用逗號分隔多個標籤"
+        formControlName="tagsInput"
+        class="w-full p-3 border border-gray-300 rounded mb-4"
+      />
+      <div class="flex gap-2">
+        <button
+          (click)="onSubmit()"
+          class="flex-1 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors"
+        >
+          {{ '更新' }}
+        </button>
+        <button
+          (click)="onCancel()"
+          class="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-400 transition-colors"
+        >
+          取消
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
