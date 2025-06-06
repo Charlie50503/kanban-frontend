@@ -9,7 +9,7 @@
           <p class="text-gray-600">管理多個專案的任務看板</p>
         </div>
         <button
-          (click)="openCreateProjectDialog()"
+          (click)="openNewProjectDialog()"
           class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
           <!-- 資料夾新增圖示 -->
@@ -146,19 +146,31 @@
           >共 {{ currentProjectSignal()!.columns?.length ?? 0 }} 個泳道</span
         >
         }
+        <!-- 總共多少任務 -->
+        @if (currentProjectSignal()!=null) {
+        <span class="text-gray-500 text-sm"
+          >總共 {{ totalTasks() }} 個任務</span
+        >
+        }
       </div>
     </header>
 
     <!-- 水平滾動容器 -->
     @if (currentProjectSignal()) {
     <div class="flex-1 overflow-x-auto">
-      <div class="flex gap-4 p-4">
+      <div
+        class="flex gap-4 p-4"
+        cdkDropList
+        (cdkDropListDropped)="onColumnDrop($event)"
+      >
         <ng-container *ngFor="let column of sortedColumnsSignal()">
-          <app-column-card
-            [currentProject]="currentProjectSignal()!"
-            [currentColumn]="column"
-            (onProjectUpdated)="getProjectDetail(currentProjectSignal()!.id!)"
-          ></app-column-card>
+          <div class="flex-shrink-0" cdkDrag [cdkDragData]="column">
+            <app-column-card
+              [currentProject]="currentProjectSignal()!"
+              [currentColumn]="column"
+              (onProjectUpdated)="getProjectDetail(currentProjectSignal()!.id!)"
+            ></app-column-card>
+          </div>
         </ng-container>
       </div>
     </div>
