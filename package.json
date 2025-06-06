@@ -4,8 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration=production --base-href /eTemplateProject/",
-    "buildUat": "ng build --configuration=uat --base-href /eTemplateProject/",
+    "build": "ng build --configuration=production --base-href /eKanban/",
+    "buildUat": "ng build --configuration=uat --base-href /eKanban/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "format": "prettier --write \"src/**/*\"",
