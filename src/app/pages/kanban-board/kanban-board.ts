@@ -17,8 +17,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-// import { Project, Task, Column } from './intefaces/task.interface';
-import { TaskDialogComponent } from './components/task-dialog/task-dialog.component';
 import { NewProjectDialog } from './components/new-project-dialog/new-project-dialog';
 import { Column, Project, Task } from 'src/app/api/v1/models';
 import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
