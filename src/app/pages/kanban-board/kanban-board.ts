@@ -267,28 +267,49 @@ export class KanbanBoard {
 
   /** 拖拽處理 */
   drop(event: CdkDragDrop<Task[] | undefined>) {
-    if (event != undefined) {
-      this.isDragOver = false;
+    if (event.previousContainer === event.container) {
+      // 在同一個泳道內移動
+      moveItemInArray(
+        event.container.data!,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    } else {
+      // 在不同泳道之間移動
+      transferArrayItem(
+        event.previousContainer.data!,
+        event.container.data!,
+        event.previousIndex,
+        event.currentIndex,
+      );
 
-      if (event.previousContainer === event.container) {
-        // 同一欄位內重新排序
-        moveItemInArray(
-          event.container.data!,
-          event.previousIndex,
-          event.currentIndex,
-        );
-      } else {
-        // 跨欄位移動
-        transferArrayItem(
-          event.previousContainer.data!,
-          event.container.data!,
-          event.previousIndex,
-          event.currentIndex,
-        );
-      }
+      // 獲取目標泳道 ID
+      const targetColumnId = event.container.id.replace('drop-list-', '');
+      const task = event.container.data![event.currentIndex];
 
-      // 更新專案資料
-      this.updateCurrentProject();
+      // 更新任務的泳道
+      this.tasksService
+        .apiTasksIdMovePatch({
+          id: task.id!,
+          body: {
+            columnId: targetColumnId,
+          },
+        })
+        .subscribe({
+          next: () => {
+            this.alertSnackbarService.onCustomSucceededMessage('任務已移動到新的泳道');
+          },
+          error: (error) => {
+            this.alertSnackbarService.onCustomFailedMessage('移動任務失敗');
+            // 如果 API 調用失敗，恢復原始狀態
+            transferArrayItem(
+              event.container.data!,
+              event.previousContainer.data!,
+              event.currentIndex,
+              event.previousIndex,
+            );
+          },
+        });
     }
   }
 
@@ -543,7 +564,7 @@ export class KanbanBoard {
   }
 
   /** 任務管理 - 顯示編輯任務表單 */
-  showEditForm(task: Task) {
+  openUpdateTaskDialog(task: Task) {
     const dialogRef = this.dialog.open(UpdateTaskDialog, {
       data: { task },
     });
@@ -589,7 +610,23 @@ export class KanbanBoard {
     //   });
   }
 
-  protected editTask(task: Task) {}
+  protected dragTask(task: Task, columnId: string) {
+    this.tasksService
+      .apiTasksIdMovePatch({
+        id: task.id!,
+        body: {
+          columnId: columnId,
+        },
+      })
+      .subscribe({
+        next: () => {
+          this.getProjectDetail(this.currentProjectSignal()!.id!);
+        },
+        error: () => {
+          this.alertSnackbarService.onAttachRequestFailed();
+        },
+      });
+  }
 
   /** 任務管理 - 取消編輯 */
   cancelEdit() {

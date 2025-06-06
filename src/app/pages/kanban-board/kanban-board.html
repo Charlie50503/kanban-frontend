@@ -253,7 +253,7 @@
                 [cdkDragData]="task"
                 class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 cursor-move hover:shadow-md transition-all duration-200 group task-card"
                 [class.cdk-drag-animating]="false"
-                (click)="editTask(task)"
+                (click)="openUpdateTaskDialog(task)"
               >
                 <div class="flex items-start gap-2">
                   <div
