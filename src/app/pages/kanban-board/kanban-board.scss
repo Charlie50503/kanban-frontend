@@ -116,3 +116,51 @@
   transform: scale(0.95);
   pointer-events: none;
 }
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: #f3f4f6;
+}
+
+.drag-preview {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+  transform: rotate(2deg);
+}
+
+.drag-placeholder {
+  border: 2px dashed #9ca3af;
+  border-radius: 0.75rem;
+  background-color: #e5e7eb;
+  opacity: 0.5;
+  transition: all 0.2s ease;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.5;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drag-handle {
+  cursor: move;
+}
+
+.cdk-drag-handle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}

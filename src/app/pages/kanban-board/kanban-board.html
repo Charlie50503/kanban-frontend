@@ -161,6 +161,8 @@
       <div
         class="flex gap-4 p-4"
         cdkDropList
+        cdkDropListOrientation="horizontal"
+
         (cdkDropListDropped)="onColumnDrop($event)"
       >
         <ng-container *ngFor="let column of sortedColumnsSignal()">
