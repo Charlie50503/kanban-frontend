@@ -638,13 +638,31 @@ export class KanbanBoard {
   }
 
   /** 任務管理 - 刪除任務 */
-  deleteTask(taskId: string) {
-    this.currentProject.columns = this.currentProject.columns!.map((col) => ({
-      ...col,
-      tasks: col.tasks!.filter((t) => t.id !== taskId),
-    }));
-
-    this.updateCurrentProject();
+  deleteTask(taskId: string): void {
+    this.confirmDialogService
+      .onDeleteConfirm()
+      .afterClosed()
+      .pipe(
+        filter((res) => !!res),
+        switchMap(() => this.tasksService.apiTasksIdDelete({ id: taskId })),
+      )
+      .subscribe({
+        next: () => {
+          // 從所有泳道中移除該任務
+          this.sortedColumnsSignal()?.forEach((column) => {
+            const taskIndex = column.tasks?.findIndex((t) => t.id === taskId);
+            if (taskIndex !== undefined && taskIndex !== -1) {
+              column.tasks?.splice(taskIndex, 1);
+            }
+          });
+          this.cdr.detectChanges();
+          this.alertSnackbarService.onDeleteRequestSucceeded();
+        },
+        error: (error) => {
+          console.error('Error deleting task:', error);
+          this.alertSnackbarService.onDeleteRequestFailed();
+        },
+      });
   }
 
   /** 取得優先級顏色 */
