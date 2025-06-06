@@ -1,0 +1,51 @@
+<h2 mat-dialog-title class="text-xl font-semibold mb-4">新增任務</h2>
+
+    <mat-dialog-content class="mat-typography">
+      <div class="grid gap-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>任務標題</mat-label>
+          <input matInput [(ngModel)]="task.title" placeholder="請輸入任務標題" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>任務描述</mat-label>
+          <textarea matInput [(ngModel)]="task.description" placeholder="請輸入任務描述" rows="3"></textarea>
+        </mat-form-field>
+
+        <div class="grid grid-cols-2 gap-4">
+          <mat-form-field appearance="outline">
+            <mat-label>負責人</mat-label>
+            <input matInput [(ngModel)]="task.assignee" placeholder="請輸入負責人">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>截止日期</mat-label>
+            <input matInput [matDatepicker]="picker" [(ngModel)]="task.dueDate">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>優先級</mat-label>
+          <mat-select [(ngModel)]="task.priority">
+            <mat-option value="low">低優先級</mat-option>
+            <mat-option value="medium">中優先級</mat-option>
+            <mat-option value="high">高優先級</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>標籤</mat-label>
+          <input matInput [(ngModel)]="tagsInput" placeholder="使用逗號分隔多個標籤" (input)="onTagsInputChange($event)">
+          <mat-hint>例如：前端, API, 設計</mat-hint>
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="mt-4">
+      <button mat-button (click)="onCancel()">取消</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!task.title">
+        新增
+      </button>
+    </mat-dialog-actions>
