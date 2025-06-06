@@ -1,0 +1,47 @@
+Copy code
+# Ignore files and directories that are generated or compiled
+bin/
+build/
+dist/
+lib/
+node_modules/
+obj/
+
+# Ignore files and directories that are specific to a particular operating system
+.DS_Store
+Thumbs.db
+
+# Ignore files and directories that are specific to a particular editor or tool
+.idea/
+.vscode/
+
+# Ignore files and directories that are used for testing or debugging
+coverage/
+test/
+tests/
+
+# Ignore files and directories that are used for documentation
+docs/
+
+# Ignore miscellaneous files and directories
+.gitignore
+.prettierignore
+.travis.yml
+CHANGELOG.md
+LICENSE
+README.md
+
+# 所有圖片格式
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.ico
+
+# 其他自定義部分
+/src/app/api/
+/src/assets/*
+*.txt
+*.otf
+

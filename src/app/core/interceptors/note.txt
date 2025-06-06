@@ -1,0 +1,8 @@
+api.interceptor.ts.old 是 angular 14 以前的主要寫法
+現在可以使用 function base 寫法
+目前兩種寫法都可以支援
+
+可以參考:
+https://www.momochenisme.com/2023/05/angular-standalone-httpinterceptor.html
+
+※根據專案需要選擇一種寫法, 另一個檔案刪除即可

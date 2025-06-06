@@ -1,0 +1,7 @@
+/**
+** fix tailwind css conflict with material ui
+** url:https://github.com/tailwindlabs/tailwindcss/discussions/9993
+*/
+.mdc-notched-outline__notch {
+  border-right: none !important;
+}

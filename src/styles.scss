@@ -1,20 +1,4 @@
 /* You can add global styles to this file, and also import other style files */
-
-html, body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
-}
-
-@tailwind base;
-
-@tailwind components;
-
-@tailwind utilities;
-
-.mdc-notched-outline__leading, .mdc-notched-outline__notch, .mdc-notched-outline__trailing {
-  border-style: none;
-}
+@import "./scss/base/base";
+@import "./scss/vender/tailwind";
+@import "./scss/vender/material-ui";

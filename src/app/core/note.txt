@@ -1,0 +1,6 @@
+這裡主要放置
+
+1. 初始化專案時會一起建立的內容
+2. 整個專案裡面只會存在單一 instance 的內容
+3. 還有像是 interceptor, guard, auth, constant
+4. 另外像是 utils 等共用功能，可以自行決定該放在 core 或是 shared 還是另外放置一個 folder

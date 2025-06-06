@@ -1,0 +1,93 @@
+<div class="headerBar flex items-center">
+  <img src="assets/images/logo.png" />
+</div>
+<div class="pt-24">
+  <form [formGroup]="loginFormGroup" autocomplete="off">
+    <h1 class="" font="noto-medium" class="mb-4 text-3xl font-bold text-center">
+      系統名稱
+    </h1>
+    <ul class="list-none text-center">
+      <li class="">
+        <mat-form-field class="w-80">
+          <mat-label font="noto-medium">帳號</mat-label>
+          <input formControlName="userAccount" matInput />
+          <mat-error>
+            <ng-container *ngIf="
+                loginFormGroup.controls['userAccount'].hasError('required')
+              ">
+              該欄位必填
+            </ng-container>
+          </mat-error>
+        </mat-form-field>
+      </li>
+      <li>
+        <mat-form-field class="w-80">
+          <mat-label font="noto-medium">密碼</mat-label>
+          <input formControlName="password" matInput autocomplete="on"
+            [type]="isLoginPasswordHide ? 'password' : 'text'" (keyup.enter)="LoginUI()" />
+          <button type="button" mat-icon-button matSuffix (click)="isLoginPasswordHide = !isLoginPasswordHide">
+            <mat-icon>{{
+              isLoginPasswordHide ? "visibility_off" : "visibility"
+              }}</mat-icon>
+          </button>
+          <mat-error>
+            <ng-container *ngIf="
+                loginFormGroup.controls['userAccount'].hasError('required')
+              ">
+              該欄位必填
+            </ng-container>
+          </mat-error>
+        </mat-form-field>
+      </li>
+    </ul>
+    <div class="text-center">
+      <button mat-raised-button class="hover:opacity-80" color="primary" font="noto-regular" type="submit"
+        (click)="LoginUI(); (false)">
+        登入系統頁面
+      </button>
+    </div>
+  </form>
+</div>
+
+<footer class="loginFooter">
+  <div class="flex flex-col lg:flex-row p-4 justify-center lg:px-0">
+    <div class="">
+      <span>
+        <a class="loginFooterText displayUnderLine" href="https://www.pscnet.com.tw/pscnetStock/index.do"
+          target="_blank">統一綜合證券股份有限公司</a>
+      </span>
+    </div>
+    <div class="px-2 hidden lg:block">
+      <span>|</span>
+    </div>
+    <div class="">
+      <span>110年金管證總字第0006號</span>
+    </div>
+
+    <div class="px-2 hidden lg:block">
+      <span>|</span>
+    </div>
+
+    <div class="">
+      <span>客服專線： (02) 8172-4668</span>
+    </div>
+
+    <div class="px-2 hidden lg:block">
+      <span>|</span>
+    </div>
+
+    <div class="">
+      <span>服務信箱：</span>
+      <span>
+        <a class="displayUnderLine loginFooterText"
+          href="mailto:info-center@uni-psg.com">info-center&#64;uni-psg.com</a>
+      </span>
+    </div>
+    <div class="px-2 hidden lg:block">
+      <span>|</span>
+    </div>
+    <div class="">
+      <span>© 2023 President Securities Corporation All Rights Reserved</span>
+    </div>
+  </div>
+</footer>

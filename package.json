@@ -4,9 +4,14 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --configuration=production --base-href /eTemplateProject/",
+    "buildUat": "ng build --configuration=uat --base-href /eTemplateProject/",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "format": "prettier --write \"src/**/*\"",
+    "clean:api": "del-cli --force src/app/api/v*",
+    "apigen:v1": "ng-openapi-gen --input http://localhost:22437/swagger/v1/swagger.json --output src/app/api/v1",
+    "apigen": "npm run clean:api & npm run apigen:v1"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +25,7 @@
     "@angular/platform-browser": "^20.0.0",
     "@angular/router": "^20.0.0",
     "@auth0/angular-jwt": "^5.2.0",
+    "ngx-spinner": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

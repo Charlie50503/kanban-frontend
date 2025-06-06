@@ -1,0 +1,25 @@
+<div class="flex justify-between">
+  <div class="flex">
+    <div class="mr-2 flex items-center">
+      <ng-container [ngSwitch]="data.action">
+        <mat-icon class="text-emerald-600" *ngSwitchCase="actionType.SUCCESS">
+          task_alt
+        </mat-icon>
+        <mat-icon class="text-red-700" *ngSwitchCase="actionType.ERROR">
+          cancel
+        </mat-icon>
+        <mat-icon class="text-amber-400" *ngSwitchCase="actionType.WARNING">
+          error
+        </mat-icon>
+      </ng-container>
+    </div>
+    <div font="dream-regular" class="flex items-center text-base font-bold">
+      {{ data.message }}
+    </div>
+  </div>
+  <div>
+    <button mat-icon-button (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+這裡可以放一些共用元件
+
+如: 員工搜尋 dialog, 部門組織搜尋 dialog, 特效 button, 客製化 input 等
+
+這裡放的元件盡量越單純越好，最好每個元件都是獨立元件(standalone component)
+只有在會被使用的 module 或是 component 再去 import 它
+
+※注意不要建立一大包的 shared.module

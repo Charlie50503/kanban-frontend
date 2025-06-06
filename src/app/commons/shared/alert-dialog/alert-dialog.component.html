@@ -1,0 +1,132 @@
+<!-- ==== 【警告】視窗 ===== -->
+<!-- 預設樣板(warn) -->
+<div class="p-4" *ngIf="data.fieldTypeName === 'alertMsgWarn'">
+  <div class="flex items-center">
+    <mat-icon
+      color="accent"
+      class="inline-flex items-center align-middle justify-center mr-2 text-2xl"
+    >
+      info
+    </mat-icon>
+    <label class="leading-none flex items-center text-lg font-black">{{
+      this.data.alertTitle
+    }}</label>
+  </div>
+
+  <div class="flex items-center mt-4">
+    <div>
+      <label>{{ this.data.alertContent }}</label>
+    </div>
+  </div>
+
+  <div class="flex justify-end items-center mt-4">
+    <button
+      mat-raised-button
+      color="accent"
+      class="py-2 px-4"
+      (click)="cf_onOkClick()"
+    >
+      OK
+    </button>
+  </div>
+</div>
+
+<!-- info樣板 -->
+<div class="p-4" *ngIf="data.fieldTypeName === 'alertMsgInfo'">
+  <div class="flex items-center gap-2">
+    <mat-icon
+      color="primary"
+      class="inline-flex items-center align-middle justify-center mr-2 text-2xl"
+    >
+      info
+    </mat-icon>
+    <label class="leading-none flex items-center text-lg font-black">{{
+      this.data.alertTitle
+    }}</label>
+  </div>
+
+  <div class="flex items-center mt-4">
+    <div>
+      <label>{{ this.data.alertContent }}</label>
+    </div>
+  </div>
+
+  <div class="flex justify-end items-center mt-4">
+    <button
+      mat-raised-button
+      color="primary"
+      class="py-2 px-4"
+      (click)="cf_onOkClick()"
+    >
+      OK
+    </button>
+  </div>
+</div>
+
+<!-- loginError -->
+<div class="p-4" *ngIf="data.fieldTypeName === 'loginerror'">
+  <div class="flex items-center">
+    <mat-icon
+      class="inline-flex items-center align-middle justify-center text-yellow-500 mr-2 text-2xl"
+    >
+      warning
+    </mat-icon>
+    <label class="leading-none flex items-center text-lg font-black">{{
+      this.data.alertTitle
+    }}</label>
+  </div>
+  <div class="mt-4">
+    <label class="font-bold text-red-600">{{ this.data.alertContent }}</label>
+  </div>
+  <div class="flex justify-end items-center mt-4">
+    <button
+      mat-raised-button
+      color="accent"
+      class="py-2 px-4"
+      (click)="cf_onOkClick()"
+    >
+      了解
+    </button>
+  </div>
+</div>
+
+<!-- confirm確認視窗 -->
+<div class="p-4" *ngIf="data.fieldTypeName === 'alertMsgConfirm'">
+  <div class="flex items-center gap-4">
+    <div class="font-bold flex items-center">
+      <mat-icon
+        color="primary"
+        class="inline-flex items-center align-middle justify-center mr-2 text-2xl"
+      >
+        check_circle
+      </mat-icon>
+      <label class="leading-none flex items-center text-lg font-black">{{
+        this.data.alertTitle
+      }}</label>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mt-4">
+    <div>
+      <label>{{ this.data.alertContent }}</label>
+    </div>
+  </div>
+
+  <div class="flex justify-end items-center mt-4">
+    <button
+      mat-raised-button
+      color="primary"
+      class="py-2 px-4 mr-4"
+      (click)="cf_onOkClick()"
+    >
+      確定
+    </button>
+    <button
+      mat-raised-button
+      class="bg-gray-300 text-black py-2 px-4"
+      (click)="cf_onNoClick()"
+    >
+      取消
+    </button>
+  </div>
+</div>
