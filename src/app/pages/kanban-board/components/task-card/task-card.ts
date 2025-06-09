@@ -5,10 +5,11 @@ import { KanbanTask } from 'src/app/api/v1/models';
 import { TaskService } from 'src/app/api/v1/services';
 import { AlertSnackbarService } from 'src/app/commons/shared/alert-snackbar/alert-snackbar.service';
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
+import { PriorityPipe } from 'src/app/core/pipes/priority-pipe';
 
 @Component({
   selector: 'app-task-card',
-  imports: [CommonModule],
+  imports: [CommonModule,PriorityPipe],
   templateUrl: './task-card.html',
   styleUrl: './task-card.scss',
 })

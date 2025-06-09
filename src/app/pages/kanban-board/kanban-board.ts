@@ -72,7 +72,6 @@ export class KanbanBoard {
 
   /** 專案管理 - 顯示編輯專案表單 */
   protected openUpdateProjectDialog() {
-    // TODO
     this.dialog
       .open(UpdateProjectDialog, {
         data: {
@@ -83,6 +82,7 @@ export class KanbanBoard {
       .pipe(filter((res) => !!res))
       .subscribe(() => {
         this.getProjectDetail(this.currentProjectSignal()!.id!);
+        this.queryProjects();
       });
   }
 
@@ -193,6 +193,15 @@ export class KanbanBoard {
       error: () => {
         this.alertSnackbarService.onAttachRequestFailed();
       },
+    });
+  }
+
+  private queryProjects() {
+    this.projectsService.apiProjectsGet$Json().subscribe({
+      next: (res) => {
+        this.projectsSignal.set(res as Project[]);
+      },
+      error: (error: any) => this.alertSnackbarService.onQueryRequestFailed(),
     });
   }
 

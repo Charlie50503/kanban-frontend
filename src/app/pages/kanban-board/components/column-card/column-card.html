@@ -1,5 +1,5 @@
 <div
-  class="bg-gray-50 rounded-xl p-4 w-80 min-h-[600px] flex-shrink-0 transition-all duration-200 currentColumn()-container"
+  class="bg-gray-50 rounded-xl p-4 w-[420px] min-h-[600px] flex-shrink-0 transition-all duration-200 currentColumn()-container"
   [class.drag-over]="isDragOver"
 >
   <!-- 欄位標題與管理按鈕 -->
@@ -96,7 +96,7 @@
       cdkDragBoundary=".flex-1"
       cdkDragPreviewContainer="global"
       cdkDragPreviewClass="drag-preview"
-      class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 cursor-move hover:shadow-md transition-all duration-200 group task-card"
+      class=""
       [class.cdk-drag-animating]="false"
       (click)="openUpdateTaskDialog(task)"
     >

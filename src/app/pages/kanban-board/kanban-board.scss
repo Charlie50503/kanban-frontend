@@ -56,11 +56,11 @@
   transform: scale(1.02);
 }
 
-/* 任務卡片 hover 效果 */
-.task-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transform: translateY(-2px);
-}
+// /* 任務卡片 hover 效果 */
+// .task-card:hover {
+//   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+//   transform: translateY(-2px);
+// }
 
 /* 拖拽中的列表樣式 */
 .cdk-drop-list-dragging .cdk-drag {

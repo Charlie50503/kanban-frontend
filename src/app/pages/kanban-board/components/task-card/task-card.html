@@ -1,4 +1,6 @@
-<div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 group hover:shadow-md transition-shadow">
+<div
+  class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 group hover:shadow-md transition-shadow"
+>
   <div class="flex items-start gap-3">
     <div
       class="flex-shrink-0 mt-1 text-gray-400 group-hover:text-gray-600 transition-colors"
@@ -20,7 +22,7 @@
       </svg>
     </div>
     <div class="flex-1 min-w-0">
-      <div class="flex justify-between items-start mb-2">
+      <div class="flex justify-between items-center mb-2">
         <h4
           class="font-semibold text-gray-900 text-sm leading-tight flex-1 pr-2"
           [title]="task().title"
@@ -33,7 +35,7 @@
             [ngClass]="getPriorityColor(task().priority!)"
             [title]="'優先級：' + task().priority"
           >
-            {{ task().priority!.charAt(0).toUpperCase() }}
+            {{ task().priority | priority }}
           </span>
           <button
             (click)="deleteTask(task().id!); $event.stopPropagation()"
@@ -57,7 +59,10 @@
           </button>
         </div>
       </div>
-      <p class="text-gray-600 text-sm mb-3 line-clamp-2" *ngIf="task().description">
+      <p
+        class="text-gray-600 text-sm mb-3 line-clamp-2"
+        *ngIf="task().description"
+      >
         {{ task().description }}
       </p>
       <div class="mb-3" *ngIf="task().tags && task().tags!.length > 0">
