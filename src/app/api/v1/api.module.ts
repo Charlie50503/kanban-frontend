@@ -6,10 +6,10 @@ import { NgModule, ModuleWithProviders, SkipSelf, Optional } from '@angular/core
 import { HttpClient } from '@angular/common/http';
 import { ApiConfiguration, ApiConfigurationParams } from './api-configuration';
 
-import { ProjectsService } from './services/projects.service';
-import { ColumnsService } from './services/columns.service';
-import { TasksService } from './services/tasks.service';
-import { HealthService } from './services/health.service';
+import { ColumnService } from './services/column.service';
+import { KanbanApiService } from './services/kanban-api.service';
+import { ProjectService } from './services/project.service';
+import { TaskService } from './services/task.service';
 
 /**
  * Module that provides all services and configuration.
@@ -19,10 +19,10 @@ import { HealthService } from './services/health.service';
   exports: [],
   declarations: [],
   providers: [
-    ProjectsService,
-    ColumnsService,
-    TasksService,
-    HealthService,
+    ColumnService,
+    KanbanApiService,
+    ProjectService,
+    TaskService,
     ApiConfiguration
   ],
 })

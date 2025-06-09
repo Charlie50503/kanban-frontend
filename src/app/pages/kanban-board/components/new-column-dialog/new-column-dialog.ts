@@ -1,5 +1,4 @@
 import { AlertSnackbarService } from './../../../../commons/shared/alert-snackbar/alert-snackbar.service';
-import { ColumnsService } from './../../../../api/v1/services/columns.service';
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import {
@@ -9,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ColumnService } from 'src/app/api/v1/services';
 
 export interface NewColumnDialogInput {
   projectId: string;
@@ -50,7 +50,7 @@ export class NewColumnDialog {
     public dialogRef: MatDialogRef<NewColumnDialog>,
     @Inject(MAT_DIALOG_DATA) public data: NewColumnDialogInput,
     private alertSnackbarService: AlertSnackbarService,
-    private columnsService: ColumnsService,
+    private columnsService: ColumnService,
   ) {}
 
   protected selectColor(color: string) {
@@ -64,10 +64,10 @@ export class NewColumnDialog {
       return;
     }
     this.columnsService
-      .apiProjectsProjectIdColumnsPost({
+      .apiProjectsProjectIdColumnsPost$Json({
         projectId: this.data.projectId,
         body: {
-          order: this.data.columnSize,
+          // order: this.data.columnSize,
           ...this.formGroup.getRawValue(),
         },
       })

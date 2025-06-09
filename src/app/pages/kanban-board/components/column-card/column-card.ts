@@ -2,14 +2,14 @@ import { Component, computed, input, output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { filter } from 'rxjs';
 import {
-  ProjectsService,
-  ColumnsService,
-  TasksService,
+  ProjectService,
+  ColumnService,
+  TaskService,
 } from 'src/app/api/v1/services';
 import { AlertSnackbarService } from 'src/app/commons/shared/alert-snackbar/alert-snackbar.service';
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
 import { NewTaskDialog } from '../new-task-dialog/new-task-dialog';
-import { Column, Project, Task } from 'src/app/api/v1/models';
+import { Column, Project, KanbanTask } from 'src/app/api/v1/models';
 import { UpdateColumnDialog } from '../update-column-dialog/update-column-dialog';
 import { CommonModule } from '@angular/common';
 import {
@@ -31,7 +31,7 @@ export class ColumnCard {
   public currentProject = input.required<Project>();
   public currentColumn = input.required<Column>();
   protected sortedColumnsSignal = computed(() => {
-    return this.currentProject()?.columns!.sort((a, b) => a.order - b.order);
+    return this.currentProject()?.columns!.sort((a, b) => a.order! - b.order!);
   });
 
   protected connectedDropLists = computed(() => {
@@ -45,11 +45,11 @@ export class ColumnCard {
   public onProjectUpdated = output<void>();
   constructor(
     private dialog: MatDialog,
-    private projectsService: ProjectsService,
+    private projectsService: ProjectService,
     private alertSnackbarService: AlertSnackbarService,
     private confirmDialogService: ConfirmDialogService,
-    private columnsService: ColumnsService,
-    private tasksService: TasksService,
+    private columnsService: ColumnService,
+    private tasksService: TaskService,
   ) {}
   protected openAddTaskDialog(columnId: string) {
     this.dialog
@@ -108,7 +108,7 @@ export class ColumnCard {
   }
 
   /** 拖拽處理 */
-  drop(event: CdkDragDrop<Task[] | undefined>) {
+  drop(event: CdkDragDrop<KanbanTask[] | null | undefined>) {
     console.log(event);
 
     if (event.previousContainer === event.container) {
@@ -160,7 +160,7 @@ export class ColumnCard {
   }
 
   /** 任務管理 - 顯示編輯任務表單 */
-  protected openUpdateTaskDialog(task: Task) {
+  protected openUpdateTaskDialog(task: KanbanTask) {
     const dialogRef = this.dialog.open(UpdateTaskDialog, {
       data: { task },
     });

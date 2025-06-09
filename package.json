@@ -10,7 +10,7 @@
     "test": "ng test",
     "format": "prettier --write \"src/**/*\"",
     "clean:api": "del-cli --force src/app/api/v*",
-    "apigen:v1": "ng-openapi-gen --input http://localhost:3000/api-docs.json --output src/app/api/v1",
+    "apigen:v1": "cross-env NODE_TLS_REJECT_UNAUTHORIZED='0' ng-openapi-gen --input https://localhost:44390/swagger/v1/swagger.json --output src/app/api/v1",
     "apigen": "npm run clean:api & npm run apigen:v1"
   },
   "private": true,
@@ -35,6 +35,7 @@
     "@angular/compiler-cli": "^20.0.0",
     "@types/jasmine": "~5.1.0",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "del-cli": "^6.0.0",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",

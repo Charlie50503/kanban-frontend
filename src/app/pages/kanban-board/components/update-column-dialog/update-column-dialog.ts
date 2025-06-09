@@ -1,5 +1,4 @@
 import { AlertSnackbarService } from './../../../../commons/shared/alert-snackbar/alert-snackbar.service';
-import { ColumnsService } from './../../../../api/v1/services/columns.service';
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import {
@@ -10,6 +9,7 @@ import {
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Column } from 'src/app/api/v1/models';
+import { ColumnService } from 'src/app/api/v1/services';
 
 export interface UpdateColumnDialogInput {
   projectId: string;
@@ -51,7 +51,7 @@ export class UpdateColumnDialog {
     public dialogRef: MatDialogRef<UpdateColumnDialog>,
     @Inject(MAT_DIALOG_DATA) public data: UpdateColumnDialogInput,
     private alertSnackbarService: AlertSnackbarService,
-    private columnsService: ColumnsService,
+    private columnsService: ColumnService,
   ) {}
 
   protected selectColor(color: string) {

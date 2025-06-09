@@ -14,7 +14,7 @@ import { spinnerInterceptor } from './core/interceptors/spinner.interceptor';
 import { apiInterceptor } from './core/interceptors/api.interceptor';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxSpinnerModule } from 'ngx-spinner';
-// import { ApiModule as ApiModuleV1 } from 'src/app/api/v1/api.module';
+import { ApiModule as ApiModuleV1 } from 'src/app/api/v1/api.module';
 // 引入繁體中文語言數據
 import localeZhTw from '@angular/common/locales/zh-Hant';
 import { DatePipe, registerLocaleData } from '@angular/common';
@@ -30,7 +30,7 @@ registerLocaleData(localeZhTw);
 export const appConfig: ApplicationConfig = {
   providers: [
     importProvidersFrom([
-      // ApiModuleV1.forRoot({ rootUrl: environment.apiUrl }),
+      ApiModuleV1.forRoot({ rootUrl: environment.apiUrl }),
       JwtModule.forRoot({
         config: {
           tokenGetter,

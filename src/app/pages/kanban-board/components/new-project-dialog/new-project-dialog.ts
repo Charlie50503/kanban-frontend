@@ -1,5 +1,4 @@
 import { AlertSnackbarService } from './../../../../commons/shared/alert-snackbar/alert-snackbar.service';
-import { ProjectsService } from './../../../../api/v1/services/projects.service';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import {
@@ -9,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { ProjectService } from 'src/app/api/v1/services';
 
 @Component({
   selector: 'app-new-project-dialog',
@@ -31,7 +31,7 @@ export class NewProjectDialog {
   constructor(
     public dialogRef: MatDialogRef<NewProjectDialog>,
     private alertSnackbarService: AlertSnackbarService,
-    private projectsService: ProjectsService,
+    private projectsService: ProjectService,
   ) {}
   protected onSubmit() {
     this.formGroup.markAllAsTouched();
@@ -40,7 +40,7 @@ export class NewProjectDialog {
       return;
     }
     this.projectsService
-      .apiProjectsPost({ body: this.formGroup.getRawValue() })
+      .apiProjectsPost$Json({ body: this.formGroup.getRawValue() })
       .subscribe({
         next: () => {
           this.dialogRef.close(true);

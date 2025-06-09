@@ -1,5 +1,4 @@
 import { AlertSnackbarService } from './../../commons/shared/alert-snackbar/alert-snackbar.service';
-import { ProjectsService } from './../../api/v1/services/projects.service';
 // src/app/kanban-board/kanban-board.component.ts
 import { Component, computed, signal } from '@angular/core';
 import {
@@ -15,9 +14,9 @@ import { Project, Column } from 'src/app/api/v1/models';
 import { NewColumnDialog } from './components/new-column-dialog/new-column-dialog';
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
 import { filter, switchMap } from 'rxjs';
-import { ColumnsService } from 'src/app/api/v1/services';
 import { UpdateProjectDialog } from './components/update-project-dialog/update-project-dialog';
 import { ColumnCard } from './components/column-card/column-card';
+import { ColumnService, ProjectService } from 'src/app/api/v1/services';
 
 @Component({
   selector: 'app-kanban-board',
@@ -34,26 +33,26 @@ export class KanbanBoard {
 
   protected sortedColumnsSignal = computed(() => {
     return this.currentProjectSignal()?.columns?.sort(
-      (a, b) => a.order - b.order,
+      (a, b) => a.order! - b.order!,
     );
   });
 
   constructor(
     private dialog: MatDialog,
-    private projectsService: ProjectsService,
-    private columnsService: ColumnsService,
+    private projectsService: ProjectService,
+    private columnsService: ColumnService,
     private alertSnackbarService: AlertSnackbarService,
     private confirmDialogService: ConfirmDialogService,
   ) {
     this.initQueryProjects();
   }
 
-  protected totalTasks = computed(()=>{
+  protected totalTasks = computed(() => {
     return this.currentProjectSignal()?.columns?.reduce(
       (total, column) => total + (column.tasks?.length || 0),
       0,
     );
-  })
+  });
 
   /** 專案管理 - 切換專案 */
   protected switchProject(projectId: string) {
@@ -139,7 +138,9 @@ export class KanbanBoard {
     this.columnsService
       .apiProjectsProjectIdColumnsReorderPatch({
         projectId: this.currentProjectSignal()!.id!,
-        body: { columnIds: columns.map((column) => column.id!) },
+        body: {
+          columnIds: columns.map((column, index) => column.id!),
+        },
       })
       .subscribe(
         () => {
@@ -172,7 +173,7 @@ export class KanbanBoard {
   }
 
   protected initQueryProjects() {
-    this.projectsService.apiProjectsGet().subscribe({
+    this.projectsService.apiProjectsGet$Json().subscribe({
       next: (res) => {
         this.projectsSignal.set(res as Project[]);
         if (res.length > 0) {
@@ -185,7 +186,7 @@ export class KanbanBoard {
   }
 
   protected getProjectDetail(id: string) {
-    this.projectsService.apiProjectsIdGet({ id: id }).subscribe({
+    this.projectsService.apiProjectsIdGet$Json({ id: id }).subscribe({
       next: (res) => {
         this.currentProjectSignal.set(res);
       },
@@ -194,7 +195,6 @@ export class KanbanBoard {
       },
     });
   }
-
 
   /** 泳道管理 - 顯示新增泳道表單 */
   protected openCreateColumnDialog() {
@@ -214,6 +214,4 @@ export class KanbanBoard {
         }
       });
   }
-
-
 }

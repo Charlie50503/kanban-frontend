@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Project } from '../../intefaces/task.interface';
-import { ProjectsService } from 'src/app/api/v1/services';
+import { ProjectService } from 'src/app/api/v1/services';
 
 @Component({
   selector: 'app-update-project-dialog',
@@ -17,7 +17,7 @@ import { ProjectsService } from 'src/app/api/v1/services';
 })
 export class UpdateProjectDialog {
   private readonly dialogRef = inject(MatDialogRef<UpdateProjectDialog>);
-  private readonly projectsService = inject(ProjectsService);
+  private readonly projectsService = inject(ProjectService);
 
   /** 表單群組 */
   protected formGroup = new FormGroup({

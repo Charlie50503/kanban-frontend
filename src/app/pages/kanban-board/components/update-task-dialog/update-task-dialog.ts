@@ -1,4 +1,3 @@
-import { TasksService } from './../../../../api/v1/services/tasks.service';
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -17,12 +16,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
-import { Task } from 'src/app/api/v1/models';
+import {
+  MatNativeDateModule,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { idText } from 'typescript';
+import { KanbanTask } from 'src/app/api/v1/models';
+import { TaskService } from 'src/app/api/v1/services';
 
 export interface UpdateTaskDialogInput {
-  task: Task;
+  task: KanbanTask;
 }
 
 @Component({
@@ -62,8 +65,8 @@ export class UpdateTaskDialog {
     dueDate: new FormControl(this.data.task.dueDate, {
       nonNullable: true,
     }),
-    priority: new FormControl<'low' | 'medium' | 'high'>(
-      this.data.task.priority,
+    priority: new FormControl<string>(
+      this.data.task.priority!,
       {
         nonNullable: true,
         validators: [Validators.required],
@@ -77,7 +80,7 @@ export class UpdateTaskDialog {
   constructor(
     public dialogRef: MatDialogRef<UpdateTaskDialog>,
     @Inject(MAT_DIALOG_DATA) public data: UpdateTaskDialogInput,
-    private tasksService: TasksService,
+    private tasksService: TaskService,
   ) {
     this.formGroup.setValue({
       id: this.data.task.id!,
@@ -103,7 +106,11 @@ export class UpdateTaskDialog {
       .apiTasksIdPut({
         id: this.data.task.id!,
         body: {
-          ...values,
+          title: values.title!,
+          description: values.description,
+          assignee: values.assignee,
+          dueDate: values.dueDate,
+          priority: values.priority,
           tags: values.tagsInput
             .split(',')
             .map((tag) => tag.trim())

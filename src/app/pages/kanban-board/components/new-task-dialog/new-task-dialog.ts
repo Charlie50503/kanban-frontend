@@ -1,4 +1,3 @@
-import { TasksService } from './../../../../api/v1/services/tasks.service';
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -18,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { TaskService } from 'src/app/api/v1/services';
 
 export interface NewTaskDialogInput {
   projectId: string;
@@ -69,7 +69,7 @@ export class NewTaskDialog {
   constructor(
     public dialogRef: MatDialogRef<NewTaskDialog>,
     @Inject(MAT_DIALOG_DATA) public data: NewTaskDialogInput,
-    private tasksService: TasksService,
+    private tasksService: TaskService,
   ) {}
 
   protected onSubmit() {
@@ -82,7 +82,7 @@ export class NewTaskDialog {
     const values = this.formGroup.getRawValue();
 
     this.tasksService
-      .apiProjectsProjectIdColumnsColumnIdTasksPost({
+      .apiProjectsProjectIdColumnsColumnIdTasksPost$Json({
         projectId: this.data.projectId,
         columnId: this.data.columnId,
         body: {

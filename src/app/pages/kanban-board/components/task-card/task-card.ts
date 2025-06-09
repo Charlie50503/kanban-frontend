@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { filter, switchMap } from 'rxjs';
-import { Task } from 'src/app/api/v1/models';
-import { TasksService } from 'src/app/api/v1/services';
+import { KanbanTask } from 'src/app/api/v1/models';
+import { TaskService } from 'src/app/api/v1/services';
 import { AlertSnackbarService } from 'src/app/commons/shared/alert-snackbar/alert-snackbar.service';
 import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/confirm-dialog.service';
 
@@ -13,16 +13,16 @@ import { ConfirmDialogService } from 'src/app/commons/shared/confirm-dialog/conf
   styleUrl: './task-card.scss',
 })
 export class TaskCard {
-  public task = input.required<Task>();
+  public task = input.required<KanbanTask>();
   public onTaskDeleted = output<void>();
 
   constructor(
-    private tasksService: TasksService,
+    private tasksService: TaskService,
     private alertSnackbarService: AlertSnackbarService,
     private confirmDialogService: ConfirmDialogService,
   ) {}
   /** 取得優先級顏色 */
-  protected getPriorityColor(priority: 'low' | 'medium' | 'high'): string {
+  protected getPriorityColor(priority:string): string {
     switch (priority) {
       case 'high':
         return 'bg-red-100 text-red-800 border-red-200';

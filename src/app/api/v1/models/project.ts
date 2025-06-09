@@ -4,29 +4,9 @@
 
 import { Column } from '../models/column';
 export interface Project {
-
-  /**
-   * 專案欄位列表
-   */
-  columns?: Array<Column>;
-
-  /**
-   * 建立時間
-   */
+  columns?: Array<Column> | null;
   createdAt?: string;
-
-  /**
-   * 專案描述
-   */
-  description: string;
-
-  /**
-   * 專案唯一識別碼
-   */
-  id?: string;
-
-  /**
-   * 專案名稱
-   */
+  description?: string | null;
+  id?: string | null;
   name: string;
 }
